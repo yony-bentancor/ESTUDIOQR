@@ -1,0 +1,200 @@
+{% extends 'layouts/base.njk' %}
+
+{% block body %}
+  <link rel="stylesheet" href="/css/ecosistema.css?v=53">
+
+  <main class="eqr">
+    <header class="eqr-header">
+      <a class="eqr-brand" href="/" aria-label="Estudio QR">
+        <span>ESTUDIO</span>
+        <strong>QR</strong>
+      </a>
+
+      <div class="eqr-mini">
+        <span>IDEAS</span>
+        <span>PROYECTOS</span>
+        <span>NEGOCIOS</span>
+      </div>
+
+      <nav class="eqr-nav" data-eqr-mobile-nav>
+        <a href="#proyectos">PROYECTOS</a>
+        <a href="https://www.instagram.com/estudio.qr/?hl=es" target="_blank" rel="noopener noreferrer">NOSOTROS</a>
+        <button class="eqr-nav-link eqr-contact-trigger" type="button" data-contact-open>CONTACTO</button>
+      </nav>
+
+      <button class="eqr-menu" type="button" aria-label="Abrir menú" aria-expanded="false" data-eqr-mobile-toggle>
+        <i></i>
+        <i></i>
+        <i></i>
+      </button>
+    </header>
+    <div class="eqr-mobile-backdrop" data-eqr-mobile-backdrop></div>
+
+    <section class="eqr-main">
+      <div class="eqr-copy">
+        <p class="eqr-eyebrow">DESARROLLO DIGITAL<br>PARA IDEAS REALES</p>
+
+        <h1>
+        Tecnología<br>
+        que impulsa<br>
+          <span>tu negocio</span>
+        </h1>
+
+        <div class="eqr-rule"></div>
+
+        <div class="eqr-values">
+          <span>IDEAS</span>
+          <span>DESARROLLO</span>
+          <span>SOLUCIONES</span>
+          <span>RESULTADOS</span>
+        </div>
+
+        <nav class="eqr-projects" id="proyectos">
+          <a href="{{ links.qpropiedades }}">
+            <span>GESTOR DE PROPIEDADES</span>
+            <b>→</b>
+          </a>
+          <a href="{{ links.qcasa }}">
+            <span>INMOBILIARIA</span>
+            <b>→</b>
+          </a>
+          <a href="https://dulce29-eccb0f7d7a32.herokuapp.com/">
+            <span>SITIO WEB/DULCE 29</span>
+            <b>→</b>
+          </a>
+          <a href="https://relampago-cbb2642c1c45.herokuapp.com/">
+            <span>SITIO WEB/CLUB RELAMPAGO</span>
+            <b>→</b>
+          </a>
+          <a href="https://still-hat-f113.yonybentancor.workers.dev/">
+            <span>JUEGO ONLINE/LA MALA LECHE</span>
+            <b>→</b>
+          </a>
+        </nav>
+      </div>
+
+      <div class="eqr-showcase" data-eqr-showcase>
+        <div class="eqr-track">
+
+          <button class="eqr-stage is-active" type="button" data-stage="scan">
+            <div class="eqr-visual eqr-visual-scan">
+              <span class="eqr-corner c1"></span>
+              <span class="eqr-corner c2"></span>
+              <span class="eqr-corner c3"></span>
+              <span class="eqr-corner c4"></span>
+              <div class="eqr-qr" data-qr="scan"></div>
+            </div>
+            <strong>ESCANEÁ</strong>
+            <small>IDEAS EN MOVIMIENTO</small>
+          </button>
+
+          <span class="eqr-arrow">→</span>
+
+          <button class="eqr-stage" type="button" data-stage="connect">
+            <div class="eqr-visual">
+              <div class="eqr-particle-field" data-qr="connect"></div>
+            </div>
+            <strong>CONECTA</strong>
+            <small>&nbsp;</small>
+          </button>
+
+          <span class="eqr-arrow">→</span>
+
+          <button class="eqr-stage" type="button" data-stage="create">
+            <div class="eqr-visual">
+              <div class="eqr-wave" data-qr="create"></div>
+            </div>
+            <strong>CREA</strong>
+            <small>&nbsp;</small>
+          </button>
+
+          <span class="eqr-arrow">→</span>
+
+          <button class="eqr-stage" type="button" data-stage="transform">
+            <div class="eqr-visual">
+              <div class="eqr-orb" data-qr="transform"></div>
+            </div>
+            <strong>TRANSFORMA</strong>
+            <small>&nbsp;</small>
+          </button>
+
+          <span class="eqr-arrow">→</span>
+
+          <button class="eqr-stage" type="button" data-stage="boost">
+            <div class="eqr-visual">
+              <div class="eqr-stack" data-qr="boost"></div>
+            </div>
+            <strong>IMPULSA</strong>
+            <small>&nbsp;</small>
+          </button>
+
+        </div>
+
+        <div class="eqr-dots" aria-hidden="true">
+          <i class="active"></i>
+          <i></i>
+          <i></i>
+          <i></i>
+          <i></i>
+        </div>
+      </div>
+    </section>
+
+    <footer class="eqr-footer">
+      <div class="eqr-place">
+        <i></i>
+        <span>MONTEVIDEO<br>URUGUAY</span>
+      </div>
+
+      <a
+      class="eqr-whatsapp"
+      href="https://wa.me/59895789647"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="WhatsApp Estudio QR"
+    >
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 3.2A12.5 12.5 0 0 0 5.2 22l-1.7 6.3 6.5-1.7A12.5 12.5 0 1 0 16 3.2Zm0 22.7c-2 0-3.9-.6-5.5-1.6l-.4-.2-3.8 1 1-3.7-.2-.4A10.2 10.2 0 1 1 16 25.9Zm5.6-7.6c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-1.8-.9-3-1.7-4.2-3.8-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.6-.5-.8-.5h-.7c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9 0 1.7 1.3 3.4 1.4 3.6.2.2 2.5 3.8 6 5.3 2.2.9 3 .9 4.1.8.7-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.4Z"/>
+        </svg>WHATSAPP
+      </a>
+    </footer>
+  </main>
+
+  <div class="eqr-modal" data-contact-modal aria-hidden="true">
+    <button class="eqr-modal-backdrop" type="button" aria-label="Cerrar contacto" data-contact-close></button>
+
+    <section class="eqr-modal-card" role="dialog" aria-modal="true" aria-labelledby="contact-title">
+      <button class="eqr-modal-close" type="button" aria-label="Cerrar" data-contact-close>×</button>
+
+      <div class="eqr-modal-copy">
+        <span>CONTACTO</span>
+        <h2 id="contact-title">Contanos tu idea.</h2>
+        <p>Un proyecto empieza con una conversación.</p>
+      </div>
+
+      <form class="eqr-contact-form" action="mailto:hola@ecosistemaq.uy" method="post" enctype="text/plain">
+        <div class="eqr-field">
+          <label for="nombre">NOMBRE</label>
+          <input id="nombre" name="Nombre" type="text" required>
+        </div>
+
+        <div class="eqr-field">
+          <label for="email">EMAIL</label>
+          <input id="email" name="Email" type="email" required>
+        </div>
+
+        <div class="eqr-field eqr-field-wide">
+          <label for="mensaje">CONTANOS TU IDEA</label>
+          <textarea id="mensaje" name="Mensaje" rows="4" required></textarea>
+        </div>
+
+        <button class="eqr-send" type="submit">
+        ENVIAR <span>→</span>
+        </button>
+      </form>
+    </section>
+  </div>
+
+  <script src="/js/ecosistema.js?v=53" defer></script>
+  <script src="/js/contacto-modal.js" defer></script>
+{% endblock %}
