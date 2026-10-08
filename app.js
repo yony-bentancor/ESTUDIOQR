@@ -17,7 +17,9 @@ const app=express();
 const PORT=process.env.PORT||3000;
 app.locals.links={
   qpropiedades:process.env.QPROPIEDADES_URL||'https://qpropiedades-810f06568918.herokuapp.com/',
-  qcasa:process.env.QCASA_URL||'https://qcasa-e445db3b49f9.herokuapp.com/qcasa'
+  qcasa:process.env.QCASA_URL||'https://qcasa-e445db3b49f9.herokuapp.com/qcasa',
+  // Editor de video: poné EDITOR_URL con la dirección donde esté publicado.
+  editor:process.env.EDITOR_URL||'https://github.com/yony-bentancor/editor-video-estudioqr'
 };
 
 app.set('trust proxy',1);
