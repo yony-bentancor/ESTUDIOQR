@@ -129,7 +129,7 @@ router.post('/t/collect', express.text({ type: '*/*', limit: '4kb' }), async (re
 const panel = express.Router();
 panel.use((req, res, next) => {
   if (!CLAVE) return next('router'); // sin PANEL_CLAVE el panel no existe (da 404)
-  res.set({ 'X-Robots-Tag': 'noindex, nofollow', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' });
+  res.set({ 'X-Robots-Tag': 'noindex, nofollow', 'Cache-Control': 'no-store', 'Referrer-Policy': 'strict-origin' });
   next();
 });
 panel.use(express.urlencoded({ extended: false, limit: '10kb' }));

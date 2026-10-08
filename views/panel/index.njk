@@ -266,7 +266,7 @@
     var oscuro=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches;
     var mapa=L.map(el,{scrollWheelZoom:false,worldCopyJump:true});
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      maxZoom:19,
+      maxZoom:19,referrerPolicy:'strict-origin',
       attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(mapa);
     if(oscuro)el.classList.add('mapa-oscuro');
