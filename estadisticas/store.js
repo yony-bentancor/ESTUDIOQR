@@ -41,6 +41,10 @@ function crearStoreArchivo() {
     async buscar(desde, hasta) {
       return estado.visitas.filter((v) => v.ts >= desde && v.ts <= hasta);
     },
+    async completarUbicacion(ip, lat, lon) {
+      estado.visitas.forEach((v) => { if (v.ip === ip && v.lat == null) { v.lat = lat; v.lon = lon; } });
+      persistir();
+    },
     async leerConfig() { return estado.config; },
     async guardarConfig(config) { estado.config = config; persistir(); }
   };
@@ -80,6 +84,11 @@ function crearStoreMongo(uri) {
       const c = await conectar();
       return c.visitas.find({ ts: { $gte: desde, $lte: hasta } }, { projection: { _id: 0 } })
         .sort({ ts: -1 }).limit(50000).toArray();
+    },
+    // Visitas viejas sin coordenadas: se completan cuando el panel las ubica.
+    async completarUbicacion(ip, lat, lon) {
+      const c = await conectar();
+      await c.visitas.updateMany({ ip, lat: null }, { $set: { lat, lon } });
     },
     async leerConfig() {
       const c = await conectar();

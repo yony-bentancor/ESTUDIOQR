@@ -115,7 +115,7 @@ router.post('/t/collect', express.text({ type: '*/*', limit: '4kb' }), async (re
       sid: limpiar(d.sid, 64),
       yo: (d.yo && iguales(d.yo, claveDueno())) || Boolean(sesionValida(req)),
       ip,
-      country: geo.country, countryCode: geo.countryCode, region: geo.region, city: geo.city, isp: geo.isp,
+      country: geo.country, countryCode: geo.countryCode, region: geo.region, city: geo.city, isp: geo.isp, lat: geo.lat, lon: geo.lon,
       browser: info.browser, os: info.os, device: info.device, bot: info.bot,
       lang: limpiar(d.lang, 20), screen: limpiar(d.screen, 20), tz: limpiar(d.tz, 50),
       ua: limpiar(ua, 300)
@@ -211,6 +211,35 @@ async function armarPanel(req, sesion) {
   const visitas = base.filter((v) => (mios === 'mostrar' ? true : mios === 'solo' ? esMio(v) : !esMio(v)));
   const ajenas = base.filter((v) => !esMio(v));
 
+  // Visitas guardadas antes de registrar coordenadas: se ubican ahora (máx. 40 IPs por carga).
+  const sinCoords = [...new Set(visitas.filter((v) => v.lat == null && v.ip).map((v) => v.ip))].slice(0, 40);
+  if (sinCoords.length) {
+    const res = await Promise.all(sinCoords.map(async (ip) => [ip, await ubicar(ip)]));
+    const porIp = new Map(res.filter(([, g]) => g.lat != null));
+    visitas.forEach((v) => { const g = porIp.get(v.ip); if (g && v.lat == null) { v.lat = g.lat; v.lon = g.lon; } });
+    for (const [ip, g] of porIp) store.completarUbicacion(ip, g.lat, g.lon).catch(() => {});
+  }
+
+  // Puntos del mapa: se agrupan las visitas por lugar (coordenadas redondeadas).
+  const puntos = new Map();
+  visitas.forEach((v) => {
+    if (v.lat == null || v.lon == null) return;
+    const k = `${Number(v.lat).toFixed(2)},${Number(v.lon).toFixed(2)}`;
+    let p = puntos.get(k);
+    if (!p) { p = { lat: Number(v.lat), lon: Number(v.lon), lugar: lugar(v), entradas: 0, ajenas: 0, quienes: new Set(), sitios: new Set(), ultima: v.ts }; puntos.set(k, p); }
+    p.entradas++;
+    if (!esMio(v)) p.ajenas++;
+    p.quienes.add(aliases[v.vid] || (esMio(v) ? 'vos' : v.vid.slice(0, 8)));
+    p.sitios.add(SITIOS[v.site] ? SITIOS[v.site].nombre : v.site);
+    if (v.ts > p.ultima) p.ultima = v.ts;
+  });
+  const mapa = [...puntos.values()].map((p) => ({
+    lat: p.lat, lon: p.lon, lugar: p.lugar, entradas: p.entradas, ajenas: p.ajenas,
+    quienes: [...p.quienes].slice(0, 8).join(', '), personas: p.quienes.size,
+    sitios: [...p.sitios].join(', '), ultima: fmtFecha.format(p.ultima)
+  }));
+  const sinUbicar = visitas.filter((v) => v.lat == null).length;
+
   // por sitio
   const porSitio = Object.entries(SITIOS).map(([clave, s]) => {
     const vs = visitas.filter((v) => v.site === clave);
@@ -296,6 +325,7 @@ async function armarPanel(req, sesion) {
     },
     porSitio, dias,
     paises: contar(visitas, lugar),
+    mapaJson: JSON.stringify(mapa).replace(/</g, '\\u003c'), mapaPuntos: mapa.length, sinUbicar,
     origenes: contar(visitas, (v) => origenDe(v.referrer, v.host)),
     refs: contar(visitas, 'ref'),
     dispositivos: contar(visitas, 'device'),

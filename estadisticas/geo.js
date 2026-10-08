@@ -4,11 +4,13 @@
   La ubicación por IP es aproximada: a veces muestra la ciudad del proveedor de internet.
 */
 const cache = new Map();
-const VACIO = { country: '', countryCode: '', region: '', city: '', isp: '' };
+const VACIO = { country: '', countryCode: '', region: '', city: '', isp: '', lat: null, lon: null };
 
 function esPrivada(ip) {
   return !ip || /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1$|fc|fd|fe80)/i.test(ip) || ip === '::';
 }
+
+const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : (Number.isFinite(Number(v)) && v !== '' && v != null ? Number(v) : null));
 
 async function consultar(url, timeoutMs) {
   const ctrl = new AbortController();
@@ -26,10 +28,10 @@ async function ubicar(ip) {
   let geo = null;
   const a = await consultar(`https://ipwho.is/${encodeURIComponent(ip)}?lang=es`, 2500);
   if (a && a.success !== false && a.country) {
-    geo = { country: a.country, countryCode: a.country_code || '', region: a.region || '', city: a.city || '', isp: (a.connection && (a.connection.isp || a.connection.org)) || '' };
+    geo = { country: a.country, countryCode: a.country_code || '', region: a.region || '', city: a.city || '', isp: (a.connection && (a.connection.isp || a.connection.org)) || '', lat: num(a.latitude), lon: num(a.longitude) };
   } else {
-    const b = await consultar(`http://ip-api.com/json/${encodeURIComponent(ip)}?lang=es&fields=status,country,countryCode,regionName,city,isp`, 2500);
-    if (b && b.status === 'success') geo = { country: b.country, countryCode: b.countryCode, region: b.regionName, city: b.city, isp: b.isp };
+    const b = await consultar(`http://ip-api.com/json/${encodeURIComponent(ip)}?lang=es&fields=status,country,countryCode,regionName,city,isp,lat,lon`, 2500);
+    if (b && b.status === 'success') geo = { country: b.country, countryCode: b.countryCode, region: b.regionName, city: b.city, isp: b.isp, lat: num(b.lat), lon: num(b.lon) };
   }
   geo = geo || { ...VACIO };
   if (cache.size > 5000) cache.clear();

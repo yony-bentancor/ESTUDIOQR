@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Panel de visitas</title>
   {% include "panel/_estilos.njk" %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <style>
     .wrap{max-width:1240px;margin:0 auto;padding:22px 16px 60px}
     header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:20px}
@@ -58,6 +59,12 @@
     .generador{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
     .resultado{margin-top:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;word-break:break-all;background:var(--gold-soft);padding:10px;border-radius:6px;display:none}
     p.nota{color:var(--muted);font-size:12px;margin:0 0 10px}
+    #mapa{height:420px;border-radius:6px;border:1px solid var(--line);background:var(--gold-soft);z-index:0}
+    .mapa-leyenda{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+    .mapa-leyenda i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+    .leaflet-popup-content{font:13px/1.45 Arial,Helvetica,sans-serif;margin:10px 12px}
+    .leaflet-popup-content b{font-size:14px}
+    @media (max-width:900px){ #mapa{height:320px}}
     @media (max-width:900px){.filtros{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2,.grid3{grid-template-columns:1fr}.generador{grid-template-columns:1fr}}
   </style>
 </head>
@@ -127,6 +134,21 @@
       {% endfor %}
       </tbody>
     </table></div>
+  </section>
+
+  <section>
+    <h2>Mapa de conexiones</h2>
+    {% if mapaPuntos %}
+      <div id="mapa" role="img" aria-label="Mapa con la ubicación aproximada de las conexiones"></div>
+      <div class="mapa-leyenda">
+        <span><i style="background:#b4472f"></i>Entraron otras personas</span>
+        <span><i style="background:#2f7a55"></i>Solo tus visitas</span>
+        <span>El tamaño indica la cantidad de entradas. La ubicación es aproximada (por IP).</span>
+        {% if sinUbicar %}<span>{{ sinUbicar }} {{ 'entrada' if sinUbicar == 1 else 'entradas' }} sin ubicación.</span>{% endif %}
+      </div>
+    {% else %}
+      <p class="vacio">Todavía no hay conexiones con ubicación en este período.</p>
+    {% endif %}
   </section>
 
   <section>
@@ -234,6 +256,35 @@
     </section>
   </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  (function(){
+    var el=document.getElementById('mapa');
+    if(!el||!window.L)return;
+    var puntos={{ mapaJson | safe }};
+    var oscuro=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches;
+    var mapa=L.map(el,{scrollWheelZoom:false,worldCopyJump:true});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/'+(oscuro?'dark_all':'light_all')+'/{z}/{x}/{y}{r}.png',{
+      maxZoom:18,subdomains:'abcd',
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(mapa);
+    function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+    var max=Math.max.apply(null,puntos.map(function(p){return p.entradas;}).concat([1]));
+    var limites=[];
+    puntos.forEach(function(p){
+      var ajeno=p.ajenas>0, color=ajeno?'#b4472f':'#2f7a55';
+      var r=7+Math.round(17*Math.sqrt(p.entradas/max));
+      L.circleMarker([p.lat,p.lon],{radius:r,color:color,weight:2,fillColor:color,fillOpacity:.35})
+        .bindPopup('<b>'+esc(p.lugar)+'</b><br>'+p.entradas+(p.entradas==1?' entrada':' entradas')+(ajeno?' · <span style="color:#b4472f">'+p.ajenas+' de otras personas</span>':'')+
+          '<br>Quién: '+esc(p.quienes)+'<br>Sitios: '+esc(p.sitios)+'<br>Última: '+esc(p.ultima))
+        .addTo(mapa);
+      limites.push([p.lat,p.lon]);
+    });
+    if(limites.length===1)mapa.setView(limites[0],9);
+    else mapa.fitBounds(limites,{padding:[30,30],maxZoom:9});
+    el.addEventListener('click',function(){mapa.scrollWheelZoom.enable();},{once:true});
+  })();
+</script>
 <script>
   (function(){
     var boton=document.getElementById('genBoton');
