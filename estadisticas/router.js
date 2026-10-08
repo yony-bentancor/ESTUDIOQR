@@ -137,7 +137,10 @@ panel.use(express.urlencoded({ extended: false, limit: '10kb' }));
 panel.get('/', async (req, res, next) => {
   const sesion = sesionValida(req);
   if (!sesion) return res.render('panel/login.njk', { title: 'Ingresar', ruta: PANEL_RUTA, error: req.query.error });
-  try { res.render('panel/index.njk', await armarPanel(req, sesion)); } catch (e) { next(e); }
+  try { res.render('panel/index.njk', await armarPanel(req, sesion)); } catch (e) {
+    console.error('[estadisticas] error del panel:', e);
+    res.status(500).render('panel/error.njk', { title: 'Panel', ruta: PANEL_RUTA, mensaje: e.message, esMongo: store.tipo === 'mongo' });
+  }
 });
 
 panel.post('/ingresar', (req, res) => {

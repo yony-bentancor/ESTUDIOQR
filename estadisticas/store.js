@@ -48,31 +48,46 @@ function crearStoreArchivo() {
 
 function crearStoreMongo(uri) {
   const { MongoClient } = require('mongodb');
-  const cliente = new MongoClient(uri, { serverSelectionTimeoutMS: 8000 });
-  const listo = (async () => {
-    await cliente.connect();
-    const db = cliente.db(process.env.ESTADISTICAS_DB || 'estudioqr_estadisticas');
-    const visitas = db.collection('visitas');
-    await visitas.createIndex({ ts: 1 }, { expireAfterSeconds: DIAS_GUARDADO * 86400 });
-    await visitas.createIndex({ site: 1, ts: -1 });
-    return { visitas, config: db.collection('config') };
-  })();
-  listo.catch((e) => console.error('[estadisticas] no se pudo conectar a MongoDB:', e.message));
+  let listo = null;
+  let ultimoError = '';
+  function conectar() {
+    if (listo) return listo;
+    const cliente = new MongoClient(uri, { serverSelectionTimeoutMS: 8000 });
+    listo = (async () => {
+      await cliente.connect();
+      const db = cliente.db(process.env.ESTADISTICAS_DB || 'estudioqr_estadisticas');
+      const visitas = db.collection('visitas');
+      await visitas.createIndex({ ts: 1 }, { expireAfterSeconds: DIAS_GUARDADO * 86400 });
+      await visitas.createIndex({ site: 1, ts: -1 });
+      ultimoError = '';
+      return { visitas, config: db.collection('config') };
+    })();
+    // Si falla, se descarta para reintentar en el próximo pedido.
+    listo.catch((e) => {
+      ultimoError = e.message;
+      console.error('[estadisticas] no se pudo conectar a MongoDB:', e.message);
+      listo = null;
+      cliente.close().catch(() => {});
+    });
+    return listo;
+  }
+  conectar();
   return {
     tipo: 'mongo',
-    async insertar(visita) { const c = await listo; await c.visitas.insertOne(visita); },
+    get ultimoError() { return ultimoError; },
+    async insertar(visita) { const c = await conectar(); await c.visitas.insertOne(visita); },
     async buscar(desde, hasta) {
-      const c = await listo;
+      const c = await conectar();
       return c.visitas.find({ ts: { $gte: desde, $lte: hasta } }, { projection: { _id: 0 } })
         .sort({ ts: -1 }).limit(50000).toArray();
     },
     async leerConfig() {
-      const c = await listo;
+      const c = await conectar();
       const doc = await c.config.findOne({ _id: 'panel' });
       return { ...CONFIG_INICIAL, ...(doc || {}) };
     },
     async guardarConfig(config) {
-      const c = await listo;
+      const c = await conectar();
       const { _id, ...resto } = config;
       await c.config.updateOne({ _id: 'panel' }, { $set: resto }, { upsert: true });
     }
