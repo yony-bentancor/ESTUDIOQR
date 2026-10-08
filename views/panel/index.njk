@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Panel de visitas</title>
+  {% include "panel/_estilos.njk" %}
+  <style>
+    .wrap{max-width:1240px;margin:0 auto;padding:22px 16px 60px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:20px}
+    header h1{font-size:15px;margin:2px 0 0;font-weight:600;color:var(--muted)}
+    .filtros{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:10px;align-items:end;margin-bottom:18px}
+    .filtros label{display:grid;gap:4px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    .aviso{border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start}
+    .aviso strong{display:block;font-size:15px;margin-bottom:2px}
+    .aviso.alerta{background:var(--alert-soft);color:var(--alert)}
+    .aviso.ok{background:var(--ok-soft);color:var(--ok)}
+    .aviso.info{background:var(--gold-soft);color:var(--ink)}
+    .aviso .punto{width:10px;height:10px;border-radius:50%;background:currentColor;margin-top:5px;flex:none}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+    .kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+    .kpi b{display:block;font-size:28px;font-variant-numeric:tabular-nums;line-height:1.2}
+    .kpi span{color:var(--muted);font-size:12px}
+    .kpi.destacado b{color:var(--alert)}
+    section{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:16px;min-width:0}
+    section h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin:0 0 12px;color:var(--muted);font-weight:700}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .grid2 section,.grid3 section{margin-bottom:0}
+    .fila{margin-bottom:16px}
+    .tabla{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+    td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+    tr:last-child td{border-bottom:0}
+    td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+    .sub{color:var(--muted);font-size:12px}
+    .chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--gold-soft);color:var(--gold);white-space:nowrap}
+    .chip.yo{background:var(--ok-soft);color:var(--ok)}
+    .chip.bot{background:var(--line);color:var(--muted)}
+    tr.mio td{opacity:.6}
+    .barras{display:flex;align-items:flex-end;gap:3px;height:140px;padding-top:6px}
+    .barras div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0}
+    .barras i{display:block;width:100%;background:var(--gold);border-radius:3px 3px 0 0;min-height:2px}
+    .barras small{font-size:10px;color:var(--muted);margin-top:4px;white-space:nowrap}
+    .barras.muchas small{display:none}
+    .lista{display:grid;gap:7px}
+    .lista div{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:13px}
+    .lista em{grid-column:1/-1;height:4px;border-radius:2px;background:var(--line);overflow:hidden;font-style:normal}
+    .lista em i{display:block;height:100%;background:var(--gold)}
+    .vacio{color:var(--muted);font-size:13px}
+    form.inline{display:flex;gap:6px;align-items:center}
+    form.inline input{padding:4px 8px;width:120px;font-size:12px}
+    .acciones{display:flex;gap:6px;flex-wrap:wrap}
+    .links{display:grid;gap:8px}
+    .links div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+    .links div:last-child{border-bottom:0}
+    .generador{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+    .resultado{margin-top:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;word-break:break-all;background:var(--gold-soft);padding:10px;border-radius:6px;display:none}
+    p.nota{color:var(--muted);font-size:12px;margin:0 0 10px}
+    @media (max-width:900px){.filtros{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2,.grid3{grid-template-columns:1fr}.generador{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="marca">ESTUDIO <b>QR</b></div>
+      <h1>Panel de visitas</h1>
+    </div>
+    <form method="post" action="{{ ruta }}/salir"><button class="btn claro" type="submit">Salir</button></form>
+  </header>
+
+  <form class="filtros" method="get" action="{{ ruta }}">
+    <label>Período
+      <select name="rango">{% for k, v in RANGOS %}<option value="{{ k }}" {% if k == rango %}selected{% endif %}>{{ v }}</option>{% endfor %}</select>
+    </label>
+    <label>Sitio
+      <select name="sitio"><option value="">Todos los sitios</option>{% for s in sitios %}<option value="{{ s.clave }}" {% if s.clave == sitio %}selected{% endif %}>{{ s.nombre }}</option>{% endfor %}</select>
+    </label>
+    <label>Mis visitas
+      <select name="mios">
+        <option value="ocultar" {% if mios == 'ocultar' %}selected{% endif %}>Ocultar las mías</option>
+        <option value="mostrar" {% if mios == 'mostrar' %}selected{% endif %}>Mostrar todo</option>
+        <option value="solo" {% if mios == 'solo' %}selected{% endif %}>Solo las mías</option>
+      </select>
+    </label>
+    <label>Robots y vistas previas
+      <select name="bots">
+        <option value="ocultar" {% if bots == 'ocultar' %}selected{% endif %}>Ocultar</option>
+        <option value="mostrar" {% if bots == 'mostrar' %}selected{% endif %}>Mostrar</option>
+      </select>
+    </label>
+    <button class="btn" type="submit">Ver</button>
+  </form>
+
+  {% if resumen.ajenas %}
+    <div class="aviso alerta"><span class="punto"></span><div>
+      <strong>Entraron otras personas: {{ resumen.ajenas }} {{ 'entrada' if resumen.ajenas == 1 else 'entradas' }} de {{ resumen.visitantesAjenos }} {{ 'navegador que no es tuyo' if resumen.visitantesAjenos == 1 else 'navegadores que no son tuyos' }}.</strong>
+      Última: {{ resumen.ultimaAjena }}
+    </div></div>
+  {% else %}
+    <div class="aviso ok"><span class="punto"></span><div><strong>Nadie más entró en este período.</strong>Todas las entradas registradas son tuyas (o no hubo entradas).</div></div>
+  {% endif %}
+
+  {% if almacenamiento == 'archivo' %}
+    <div class="aviso info"><span class="punto"></span><div><strong>Las visitas se guardan de forma temporal.</strong>Falta configurar MONGODB_URI en Heroku: sin eso, los datos se borran cada vez que la app se reinicia (al menos una vez por día).</div></div>
+  {% endif %}
+
+  <div class="kpis">
+    <div class="kpi"><b>{{ resumen.entradas }}</b><span>Entradas (páginas vistas)</span></div>
+    <div class="kpi"><b>{{ resumen.visitantes }}</b><span>Navegadores distintos</span></div>
+    <div class="kpi"><b>{{ resumen.sesiones }}</b><span>Visitas (sesiones)</span></div>
+    <div class="kpi {% if resumen.ajenas %}destacado{% endif %}"><b>{{ resumen.visitantesAjenos }}</b><span>Personas que no sos vos</span></div>
+  </div>
+
+  <section>
+    <h2>Por sitio</h2>
+    <div class="tabla"><table>
+      <thead><tr><th>Sitio</th><th class="num">Entradas</th><th class="num">Navegadores</th><th class="num">De otras personas</th><th>Última entrada de otra persona</th></tr></thead>
+      <tbody>
+      {% for s in porSitio %}
+        <tr><td><a href="{{ ruta }}?rango={{ rango }}&sitio={{ s.clave }}&mios={{ mios }}&bots={{ bots }}">{{ s.nombre }}</a></td>
+          <td class="num">{{ s.entradas }}</td><td class="num">{{ s.visitantes }}</td>
+          <td class="num">{% if s.ajenas %}<span class="chip">{{ s.ajenas }}</span>{% else %}0{% endif %}</td>
+          <td>{{ s.ultimaAjena }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Entradas por día</h2>
+    <div class="barras {% if dias.length > 31 %}muchas{% endif %}">
+      {% for d in dias %}<div title="{{ d.etiqueta }}: {{ d.n }}"><i style="height:{{ d.alto }}%"></i><small>{{ d.etiqueta }}</small></div>{% endfor %}
+    </div>
+  </section>
+
+  <div class="grid3 fila">
+    <section><h2>Desde dónde</h2>
+      {% if paises.length %}<div class="lista">{% for x in paises %}<div><span>{{ x.k }}</span><b>{{ x.n }}</b><em><i style="width:{{ x.pct }}%"></i></em></div>{% endfor %}</div>{% else %}<p class="vacio">Sin datos.</p>{% endif %}
+    </section>
+    <section><h2>Cómo llegaron</h2>
+      {% if origenes.length %}<div class="lista">{% for x in origenes %}<div><span>{{ x.k }}</span><b>{{ x.n }}</b><em><i style="width:{{ x.pct }}%"></i></em></div>{% endfor %}</div>{% else %}<p class="vacio">Sin datos.</p>{% endif %}
+    </section>
+    <section><h2>Dispositivos</h2>
+      {% if dispositivos.length %}<div class="lista">{% for x in dispositivos %}<div><span>{{ x.k }}</span><b>{{ x.n }}</b><em><i style="width:{{ x.pct }}%"></i></em></div>{% endfor %}</div>{% else %}<p class="vacio">Sin datos.</p>{% endif %}
+    </section>
+  </div>
+
+  <div class="grid2 fila">
+    <section><h2>Páginas más vistas</h2>
+      {% if paginas.length %}<div class="lista">{% for x in paginas %}<div><span>{{ x.k }}</span><b>{{ x.n }}</b><em><i style="width:{{ x.pct }}%"></i></em></div>{% endfor %}</div>{% else %}<p class="vacio">Sin datos.</p>{% endif %}
+    </section>
+    <section><h2>Links con nombre</h2>
+      {% if refs.length %}<div class="lista">{% for x in refs %}<div><span>{{ x.k }}</span><b>{{ x.n }}</b><em><i style="width:{{ x.pct }}%"></i></em></div>{% endfor %}</div>{% else %}<p class="vacio">Todavía nadie entró con un link con nombre. Generalos abajo, en Herramientas.</p>{% endif %}
+    </section>
+  </div>
+
+  <section>
+    <h2>Visitantes</h2>
+    <p class="nota">Cada fila es un navegador (un celular o una computadora). Si reconocés uno tuyo, marcalo con «Soy yo» y sus visitas dejan de contar como ajenas, también las pasadas. Podés ponerle un nombre a cada uno.</p>
+    {% if visitantes.length %}
+    <div class="tabla"><table>
+      <thead><tr><th>Quién</th><th class="num">Entradas</th><th>Sitios</th><th>Ubicación</th><th>Dispositivo</th><th>Primera / última</th><th>Acciones</th></tr></thead>
+      <tbody>
+      {% for v in visitantes %}
+        <tr class="{% if v.mio %}mio{% endif %}">
+          <td><b>{{ v.alias or v.corto }}</b>{% if v.mio %} <span class="chip yo">vos</span>{% endif %}
+            {% if v.refs %}<div class="sub">link: {{ v.refs }}</div>{% endif %}
+            <div class="sub">IP {{ v.ips }}</div></td>
+          <td class="num">{{ v.entradas }}</td>
+          <td>{{ v.sitios }}</td>
+          <td>{{ v.lugar }}{% if v.isp %}<div class="sub">{{ v.isp }}</div>{% endif %}</td>
+          <td>{{ v.dispositivo }}</td>
+          <td><span class="sub">{{ v.primera }}</span><br>{{ v.ultima }}</td>
+          <td><div class="acciones">
+            <form class="inline" method="post" action="{{ ruta }}/visitante">
+              <input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="vid" value="{{ v.vid }}"><input type="hidden" name="volver" value="{{ filtros }}">
+              <input type="hidden" name="accion" value="nombre"><input name="nombre" value="{{ v.alias }}" placeholder="Nombre" aria-label="Nombre">
+              <button class="btn mini claro" type="submit">Guardar</button>
+            </form>
+            <form method="post" action="{{ ruta }}/visitante">
+              <input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="vid" value="{{ v.vid }}"><input type="hidden" name="volver" value="{{ filtros }}">
+              {% if v.mio %}<input type="hidden" name="accion" value="noesmio"><button class="btn mini claro" type="submit">No soy yo</button>
+              {% else %}<input type="hidden" name="accion" value="soyyo"><button class="btn mini" type="submit">Soy yo</button>{% endif %}
+            </form>
+          </div></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    {% else %}<p class="vacio">No hay visitantes en este período.</p>{% endif %}
+  </section>
+
+  <section>
+    <h2>Últimas entradas</h2>
+    {% if ultimas.length %}
+    <div class="tabla"><table>
+      <thead><tr><th>Fecha</th><th>Sitio y página</th><th>Quién</th><th>Cómo llegó</th><th>Ubicación</th><th>Dispositivo</th></tr></thead>
+      <tbody>
+      {% for e in ultimas %}
+        <tr class="{% if e.mio %}mio{% endif %}">
+          <td style="white-space:nowrap">{{ e.fecha }}</td>
+          <td><b>{{ e.sitio }}</b> <span class="sub">{{ e.path }}</span>{% if e.titulo %}<div class="sub">{{ e.titulo }}</div>{% endif %}</td>
+          <td>{{ e.quien }}{% if e.mio %} <span class="chip yo">vos</span>{% endif %}{% if e.bot %} <span class="chip bot">robot</span>{% endif %}</td>
+          <td>{{ e.origen }}{% if e.ref %} <span class="chip">link: {{ e.ref }}</span>{% endif %}</td>
+          <td>{{ e.lugar }}<div class="sub">IP {{ e.ip }}{% if e.isp %} · {{ e.isp }}{% endif %}</div></td>
+          <td>{{ e.dispositivo }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    {% else %}<p class="vacio">No hay entradas en este período.</p>{% endif %}
+  </section>
+
+  <div class="grid2">
+    <section>
+      <h2>Herramientas · Marcar mis dispositivos</h2>
+      <p class="nota">Abrí cada link desde tu celular y tu computadora (una sola vez por sitio y navegador). Desde ese momento tus entradas quedan marcadas como tuyas. No compartas estos links. Si entrás a Estudio QR con este panel abierto, también te reconoce.</p>
+      <div class="links">
+        {% for l in linksDueno %}<div><span>{{ l.nombre }}</span><span class="acciones"><a class="btn mini" href="{{ l.marcar }}" target="_blank" rel="noopener">Marcar este navegador</a><a class="btn mini claro" href="{{ l.desmarcar }}" target="_blank" rel="noopener">Desmarcar</a></span></div>{% endfor %}
+      </div>
+    </section>
+    <section>
+      <h2>Herramientas · Links con nombre</h2>
+      <p class="nota">Para saber quién entró: generá un link distinto para cada persona. Cuando lo abra, sus visitas aparecen con ese nombre.</p>
+      <div class="generador">
+        <label class="sub">Sitio<select id="genSitio">{% for s in sitios %}{% if s.url %}<option value="{{ s.url }}">{{ s.nombre }}</option>{% endif %}{% endfor %}</select></label>
+        <label class="sub">Nombre de la persona<input id="genNombre" placeholder="ej. juan"></label>
+        <button class="btn" type="button" id="genBoton">Generar y copiar</button>
+      </div>
+      <div class="resultado" id="genResultado"></div>
+    </section>
+  </div>
+</div>
+<script>
+  (function(){
+    var boton=document.getElementById('genBoton');
+    boton.addEventListener('click',function(){
+      var nombre=document.getElementById('genNombre').value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9_-]+/g,'-').replace(/^-|-$/g,'');
+      if(!nombre){document.getElementById('genNombre').focus();return;}
+      var url=new URL(document.getElementById('genSitio').value);
+      url.searchParams.set('ref',nombre);
+      var caja=document.getElementById('genResultado');
+      caja.textContent=url.toString();caja.style.display='block';
+      if(navigator.clipboard){navigator.clipboard.writeText(url.toString()).then(function(){boton.textContent='¡Copiado!';setTimeout(function(){boton.textContent='Generar y copiar';},1800);});}
+    });
+  })();
+</script>
+</body>
+</html>

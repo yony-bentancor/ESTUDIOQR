@@ -4,6 +4,7 @@ const express=require('express');
 const compression=require('compression');
 const helmet=require('helmet');
 const nunjucks=require('nunjucks');
+const estadisticas=require('./estadisticas/router');
 
 /*
   ESTUDIO QR · Ecosistema
@@ -34,6 +35,9 @@ const staticOptions={maxAge:process.env.NODE_ENV==='production'?'7d':0,etag:true
 app.use('/css',express.static(path.join(__dirname,'public/css'),staticOptions));
 app.use('/js',express.static(path.join(__dirname,'public/js'),staticOptions));
 app.use('/img',express.static(path.join(__dirname,'public/img'),staticOptions));
+
+// Estadísticas: script /t.js, recolector /t/collect y panel privado (PANEL_RUTA, sin enlaces públicos).
+app.use(estadisticas.router);
 
 app.get('/',(req,res)=>res.render('home.njk',{title:'Estudio QR'}));
 // Enlaces viejos del repo unificado: se mandan al proyecto que corresponde.
