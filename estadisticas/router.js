@@ -14,8 +14,8 @@ const { interpretar, origenDe } = require('./ua');
 const SITIOS = require('./sitios');
 
 const PANEL_RUTA = '/' + String(process.env.PANEL_RUTA || 'panel-privado-qr').replace(/^\/+|\/+$/g, '');
-const USUARIO = process.env.PANEL_USUARIO || 'admin';
-const CLAVE = process.env.PANEL_CLAVE || '';
+const USUARIO = String(process.env.PANEL_USUARIO || 'admin').trim().toLowerCase();
+const CLAVE = String(process.env.PANEL_CLAVE || '').trim();
 const SECRETO = process.env.PANEL_SECRETO || CLAVE;
 const ZONA = process.env.ESTADISTICAS_ZONA || 'America/Montevideo';
 const COOKIE = 'qr_panel';
@@ -142,7 +142,7 @@ panel.get('/', async (req, res, next) => {
 
 panel.post('/ingresar', (req, res) => {
   if (demasiadosLogins(req)) return res.redirect(`${PANEL_RUTA}?error=intentos`);
-  const ok = iguales(req.body.usuario || '', USUARIO) && iguales(req.body.clave || '', CLAVE);
+  const ok = iguales(String(req.body.usuario || '').trim().toLowerCase(), USUARIO) && iguales(String(req.body.clave || '').trim(), CLAVE);
   if (!ok) return res.redirect(`${PANEL_RUTA}?error=datos`);
   const datos = Buffer.from(JSON.stringify({ u: USUARIO, exp: Date.now() + HORAS_SESION * 3600e3 })).toString('base64url');
   const seguro = req.secure ? '; Secure' : '';
