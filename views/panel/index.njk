@@ -123,6 +123,24 @@
   </div>
 
   <section>
+    <h2>Mensajes de contacto</h2>
+    {% if mensajes.length %}
+    <div class="tabla"><table>
+      <thead><tr><th>Fecha</th><th>De</th><th>Mensaje</th></tr></thead>
+      <tbody>
+      {% for m in mensajes %}
+        <tr>
+          <td style="white-space:nowrap">{{ m.fecha }}</td>
+          <td><b>{{ m.nombre }}</b><div class="sub"><a href="mailto:{{ m.email }}">{{ m.email }}</a></div></td>
+          <td style="white-space:pre-wrap">{{ m.mensaje }}{% if m.correo %}<div class="sub">{{ m.correo }}</div>{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    {% else %}<p class="vacio">Todavía no llegaron mensajes del formulario de contacto.</p>{% endif %}
+  </section>
+
+  <section>
     <h2>Por sitio</h2>
     <div class="tabla"><table>
       <thead><tr><th>Sitio</th><th class="num">Entradas</th><th class="num">Navegadores</th><th class="num">De otras personas</th><th>Última entrada de otra persona</th></tr></thead>

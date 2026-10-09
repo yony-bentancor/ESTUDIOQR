@@ -1,7 +1,7 @@
 {% extends 'layouts/base.njk' %}
 
 {% block body %}
-  <link rel="stylesheet" href="/css/ecosistema.css?v=53">
+  <link rel="stylesheet" href="/css/ecosistema.css?v=54">
 
   <main class="eqr">
     <header class="eqr-header">
@@ -180,29 +180,37 @@
         <p>Un proyecto empieza con una conversación.</p>
       </div>
 
-      <form class="eqr-contact-form" action="mailto:hola@ecosistemaq.uy" method="post" enctype="text/plain">
+      <form class="eqr-contact-form" action="/contacto" method="post" data-contact-form novalidate>
+        <div class="eqr-trampa" aria-hidden="true"><label>No completar<input name="sitio_web" tabindex="-1" autocomplete="off"></label></div>
         <div class="eqr-field">
           <label for="nombre">NOMBRE</label>
-          <input id="nombre" name="Nombre" type="text" required>
+          <input id="nombre" name="nombre" type="text" maxlength="120" autocomplete="name" required>
         </div>
 
         <div class="eqr-field">
           <label for="email">EMAIL</label>
-          <input id="email" name="Email" type="email" required>
+          <input id="email" name="email" type="email" maxlength="160" autocomplete="email" required>
         </div>
 
         <div class="eqr-field eqr-field-wide">
           <label for="mensaje">CONTANOS TU IDEA</label>
-          <textarea id="mensaje" name="Mensaje" rows="4" required></textarea>
+          <textarea id="mensaje" name="mensaje" rows="4" maxlength="4000" required></textarea>
         </div>
 
         <button class="eqr-send" type="submit">
         ENVIAR <span>→</span>
         </button>
+        <p class="eqr-contact-status" data-contact-status role="status" aria-live="polite"></p>
       </form>
+
+      <div class="eqr-contact-done" data-contact-done hidden>
+        <h3>¡Mensaje enviado!</h3>
+        <p>Gracias por escribirnos. Te respondemos a la brevedad al email que dejaste.</p>
+        <button class="eqr-send" type="button" data-contact-close>CERRAR</button>
+      </div>
     </section>
   </div>
 
   <script src="/js/ecosistema.js?v=53" defer></script>
-  <script src="/js/contacto-modal.js" defer></script>
+  <script src="/js/contacto-modal.js?v=2" defer></script>
 {% endblock %}

@@ -12,10 +12,14 @@ const CONFIG_INICIAL = { ownerVids: [], aliases: {} };
 
 function crearStoreArchivo() {
   const archivo = path.join(__dirname, '..', 'data', 'estadisticas.json');
-  let estado = { visitas: [], config: { ...CONFIG_INICIAL } };
+  let estado = { visitas: [], mensajes: [], config: { ...CONFIG_INICIAL } };
   try {
     const leido = JSON.parse(fs.readFileSync(archivo, 'utf8'));
-    estado = { visitas: (leido.visitas || []).map((v) => ({ ...v, ts: new Date(v.ts) })), config: { ...CONFIG_INICIAL, ...leido.config } };
+    estado = {
+      visitas: (leido.visitas || []).map((v) => ({ ...v, ts: new Date(v.ts) })),
+      mensajes: (leido.mensajes || []).map((m) => ({ ...m, ts: new Date(m.ts) })),
+      config: { ...CONFIG_INICIAL, ...leido.config }
+    };
   } catch (e) { /* sin datos previos */ }
   let pendiente = null;
   function persistir() {
@@ -46,7 +50,9 @@ function crearStoreArchivo() {
       persistir();
     },
     async leerConfig() { return estado.config; },
-    async guardarConfig(config) { estado.config = config; persistir(); }
+    async guardarConfig(config) { estado.config = config; persistir(); },
+    async guardarMensaje(m) { estado.mensajes.push(m); estado.mensajes = estado.mensajes.slice(-500); persistir(); },
+    async leerMensajes(limite = 50) { return estado.mensajes.slice(-limite).reverse(); }
   };
 }
 
@@ -64,7 +70,9 @@ function crearStoreMongo(uri) {
       await visitas.createIndex({ ts: 1 }, { expireAfterSeconds: DIAS_GUARDADO * 86400 });
       await visitas.createIndex({ site: 1, ts: -1 });
       ultimoError = '';
-      return { visitas, config: db.collection('config') };
+      const mensajes = db.collection('mensajes');
+      await mensajes.createIndex({ ts: -1 });
+      return { visitas, mensajes, config: db.collection('config') };
     })();
     // Si falla, se descarta para reintentar en el próximo pedido.
     listo.catch((e) => {
@@ -99,6 +107,12 @@ function crearStoreMongo(uri) {
       const c = await conectar();
       const { _id, ...resto } = config;
       await c.config.updateOne({ _id: 'panel' }, { $set: resto }, { upsert: true });
+    },
+    // Mensajes del formulario de contacto de Estudio QR.
+    async guardarMensaje(m) { const c = await conectar(); await c.mensajes.insertOne(m); },
+    async leerMensajes(limite = 50) {
+      const c = await conectar();
+      return c.mensajes.find({}, { projection: { _id: 0 } }).sort({ ts: -1 }).limit(limite).toArray();
     }
   };
 }

@@ -254,6 +254,14 @@ body{overflow-x:hidden}
 .eqr-send span{font-size:18px;font-weight:400}
 .eqr-send:hover{background:#0b0b0b;color:#fff;border-color:#0b0b0b;transform:translateY(-2px)}
 body.eqr-modal-open{overflow:hidden}
+.eqr-contact-form[hidden],.eqr-contact-done[hidden]{display:none}
+.eqr-trampa{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.eqr-send:disabled{opacity:.55;cursor:wait;transform:none}
+.eqr-contact-status{grid-column:1/-1;margin:-8px 0 0;min-height:1.2em;font-size:12px;line-height:1.5;color:#77716b}
+.eqr-contact-status.is-error{color:#b3261e}
+.eqr-field.is-invalid input,.eqr-field.is-invalid textarea{border-bottom-color:#b3261e}
+.eqr-contact-done h3{margin:0 0 10px;font-size:clamp(26px,3vw,36px);letter-spacing:-.04em;line-height:1}
+.eqr-contact-done p{margin:0 0 26px;color:#77716b;font-size:13px;line-height:1.6}
 
 /* TABLET */
 @media(max-width:1180px){

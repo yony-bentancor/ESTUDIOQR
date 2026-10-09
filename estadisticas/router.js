@@ -331,6 +331,10 @@ async function armarPanel(req, sesion) {
     dispositivos: contar(visitas, 'device'),
     paginas: contar(visitas, (v) => `${SITIOS[v.site] ? SITIOS[v.site].nombre : v.site} ${v.path}`),
     visitantes, ultimas,
+    mensajes: (await store.leerMensajes(30).catch(() => [])).map((m) => ({
+      fecha: fmtFecha.format(new Date(m.ts)), nombre: m.nombre, email: m.email, mensaje: m.mensaje,
+      correo: m.correo === 'enviado' ? 'Aviso enviado por correo' : m.correo === 'error' ? 'No se pudo enviar el aviso por correo' : ''
+    })),
     linksDueno: Object.values(SITIOS).filter((s) => s.url).map((s) => ({
       nombre: s.nombre,
       marcar: s.url + (s.url.includes('?') ? '&' : '?') + 'qr_yo=' + token,

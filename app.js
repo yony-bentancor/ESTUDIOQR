@@ -52,6 +52,7 @@ app.use('/img',express.static(path.join(__dirname,'public/img'),staticOptions));
 
 // Estadísticas: script /t.js, recolector /t/collect y panel privado (PANEL_RUTA, sin enlaces públicos).
 app.use(estadisticas.router);
+app.use(require('./estadisticas/contacto'));
 
 app.get('/',(req,res)=>res.render('home.njk',{title:'Estudio QR'}));
 // Enlaces viejos del repo unificado: se mandan al proyecto que corresponde.
