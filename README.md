@@ -45,7 +45,7 @@ public/js/ecosistema.js, contacto-modal.js, app.js
 
 Estudio QR mide las entradas de todos los sitios del ecosistema y las muestra en un panel privado que **no está enlazado desde ninguna página**.
 
-- Cada sitio incluye `<script async src="https://estudioqr-7fd22333fa47.herokuapp.com/t.js" data-site="nombre"></script>`.
+- Cada sitio incluye `<script async src="https://estudioqr.com.uy/t.js" data-site="nombre"></script>`.
 - El script envía cada página vista a `/t/collect` (sin cookies; usa un identificador anónimo del navegador).
 - El panel está en `/<PANEL_RUTA>` (por defecto `/panel-privado-qr`) y pide usuario y contraseña.
 

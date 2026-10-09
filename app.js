@@ -26,6 +26,17 @@ app.locals.links={
 app.set('trust proxy',1);
 nunjucks.configure(path.join(__dirname,'views'),{autoescape:true,express:app,noCache:process.env.NODE_ENV!=='production'});
 app.set('view engine','njk');
+// Dominio principal: la dirección vieja de Heroku y www pasan a estudioqr.com.uy.
+// El contador (/t.js y /t/collect) no se redirige, para no perder visitas de páginas viejas.
+const DOMINIO=String(process.env.DOMINIO_PRINCIPAL||'estudioqr.com.uy').trim().toLowerCase();
+app.use((req,res,next)=>{
+  const host=String(req.hostname||'').toLowerCase();
+  const otroHost=host.endsWith('.herokuapp.com')||host===`www.${DOMINIO}`;
+  if(DOMINIO&&otroHost&&(req.method==='GET'||req.method==='HEAD')&&!req.path.startsWith('/t.js')&&!req.path.startsWith('/t/')){
+    return res.redirect(301,`https://${DOMINIO}${req.originalUrl}`);
+  }
+  next();
+});
 app.use(compression());
 app.use(helmet({contentSecurityPolicy:false,crossOriginEmbedderPolicy:false}));
 app.use((req,res,next)=>{

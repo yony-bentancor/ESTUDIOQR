@@ -1,6 +1,6 @@
 /* Sitios que se miden. La clave es el valor de data-site en el script de cada sitio. */
 const SITIOS = {
-  estudioqr: { nombre: 'Estudio QR', url: process.env.ESTUDIOQR_URL || 'https://estudioqr-7fd22333fa47.herokuapp.com/' },
+  estudioqr: { nombre: 'Estudio QR', url: process.env.ESTUDIOQR_URL || 'https://estudioqr.com.uy/' },
   qpropiedades: { nombre: 'QPROPIEDADES', url: process.env.QPROPIEDADES_URL || 'https://qpropiedades-810f06568918.herokuapp.com/' },
   qcasa: { nombre: 'QCASA', url: process.env.QCASA_URL || 'https://qcasa-e445db3b49f9.herokuapp.com/qcasa' },
   dulce29: { nombre: 'Dulce 29', url: process.env.DULCE29_URL || 'https://dulce29-eccb0f7d7a32.herokuapp.com/' },
