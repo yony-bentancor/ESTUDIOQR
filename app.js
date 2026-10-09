@@ -19,7 +19,8 @@ app.locals.links={
   qpropiedades:process.env.QPROPIEDADES_URL||'https://qpropiedades-810f06568918.herokuapp.com/',
   qcasa:process.env.QCASA_URL||'https://qcasa-e445db3b49f9.herokuapp.com/qcasa',
   // Editor de video: poné EDITOR_URL con la dirección donde esté publicado.
-  editor:process.env.EDITOR_URL||'https://editor-estudioqr-903352622381.herokuapp.com/'
+  editor:process.env.EDITOR_URL||'https://editor-estudioqr-903352622381.herokuapp.com/',
+  alternativa:process.env.ALTERNATIVA_URL||'https://alternativas-1c4c4edd0605.herokuapp.com/'
 };
 
 app.set('trust proxy',1);
