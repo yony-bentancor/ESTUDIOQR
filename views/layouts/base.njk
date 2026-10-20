@@ -1,18 +1,44 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-UY">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>
-      {% if title and title != 'Estudio QR' %}{{ title }} | Estudio QR{% else %}Estudio QR{% endif %}
-    </title>
+    {% set fullTitle = pageTitle or ((title ~ ' | Estudio QR') if (title and title != 'Estudio QR') else 'Estudio QR') %}
+    <title>{{ fullTitle }}</title>
     <meta name="description" content="{{ metaDescription }}">
+    {% if noindex %}
+    <meta name="robots" content="noindex, nofollow">
+    {% else %}
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
     {% if canonicalUrl %}<link rel="canonical" href="{{ canonicalUrl }}">{% endif %}
-    <meta property="og:title" content="{{ title or 'Estudio QR' }}">
+    {% endif %}
+    <meta name="author" content="Estudio QR">
+    <meta name="geo.region" content="UY-MO">
+    <meta name="geo.placename" content="Montevideo">
+    <meta name="theme-color" content="#fbfaf7">
+
+    <meta property="og:site_name" content="Estudio QR">
+    <meta property="og:locale" content="es_UY">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ fullTitle }}">
     <meta property="og:description" content="{{ metaDescription }}">
     {% if canonicalUrl %}<meta property="og:url" content="{{ canonicalUrl }}">{% endif %}
-    <meta property="og:type" content="website">
-    {% if metaImage %}<meta property="og:image" content="{{ metaImage }}">{% endif %}
+    {% if metaImage %}
+    <meta property="og:image" content="{{ metaImage }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Estudio QR · Tecnología que impulsa tu negocio">
+    {% endif %}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ fullTitle }}">
+    <meta name="twitter:description" content="{{ metaDescription }}">
+    {% if metaImage %}<meta name="twitter:image" content="{{ metaImage }}">{% endif %}
+
+    <link rel="icon" href="/img/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="Resumen para asistentes de IA">
+    {% if jsonLd and not noindex %}<script type="application/ld+json">{{ jsonLd | safe }}</script>{% endif %}
+
     <link rel="stylesheet" href="/css/app.css">
     {% block styles %}{% endblock %}
   </head>

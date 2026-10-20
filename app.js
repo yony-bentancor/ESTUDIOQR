@@ -5,6 +5,7 @@ const compression=require('compression');
 const helmet=require('helmet');
 const nunjucks=require('nunjucks');
 const estadisticas=require('./estadisticas/router');
+const {SITIO,crearRouterSeo,datosEstructurados}=require('./seo');
 
 /*
   ESTUDIO QR · Ecosistema
@@ -39,9 +40,13 @@ app.use((req,res,next)=>{
 });
 app.use(compression());
 app.use(helmet({contentSecurityPolicy:false,crossOriginEmbedderPolicy:false}));
+// Metadatos para buscadores: la URL canónica siempre apunta al dominio principal.
+const jsonLd=JSON.stringify(datosEstructurados(app.locals.links)).replace(/</g,'\\u003c');
 app.use((req,res,next)=>{
-  res.locals.canonicalUrl=`${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
-  res.locals.metaDescription='Estudio QR · Gestión de propiedades, inmobiliaria, sitios web y juegos online.';
+  res.locals.canonicalUrl=`${SITIO.url}${req.path==='/'?'/':req.path}`;
+  res.locals.metaDescription=SITIO.descripcion;
+  res.locals.metaImage=`${SITIO.url}/img/og-estudioqr.png`;
+  res.locals.jsonLd=jsonLd;
   next();
 });
 
@@ -51,20 +56,26 @@ app.use('/js',express.static(path.join(__dirname,'public/js'),staticOptions));
 app.use('/img',express.static(path.join(__dirname,'public/img'),staticOptions));
 
 // Estadísticas: script /t.js, recolector /t/collect y panel privado (PANEL_RUTA, sin enlaces públicos).
+// El panel y el contador nunca deben aparecer en buscadores.
+app.use((req,res,next)=>{
+  if(req.path.startsWith(estadisticas.PANEL_RUTA||'/__sin_panel__')||req.path.startsWith('/t/')) res.set('X-Robots-Tag','noindex, nofollow');
+  next();
+});
 app.use(estadisticas.router);
 app.use(require('./estadisticas/contacto'));
 
-app.get('/',(req,res)=>res.render('home.njk',{title:'Estudio QR'}));
+app.use(crearRouterSeo(app.locals.links));
+
+app.get('/',(req,res)=>res.render('home.njk',{title:'Estudio QR',pageTitle:'Estudio QR · Desarrollo web y software a medida en Montevideo, Uruguay'}));
 // Enlaces viejos del repo unificado: se mandan al proyecto que corresponde.
 app.get(['/qpropiedades','/alta','/seguimiento','/ingresar'],(req,res)=>res.redirect(301,app.locals.links.qpropiedades));
 app.get('/qcasa*',(req,res)=>res.redirect(301,app.locals.links.qcasa));
-app.get('/robots.txt',(req,res)=>res.type('text/plain').send('User-agent: *\nAllow: /\n'));
 
 app.use((err,req,res,next)=>{
   console.error(err);
-  res.status(500).render('errors/500.njk',{title:'Error',error:process.env.NODE_ENV==='development'?err.message:null});
+  res.status(500).render('errors/500.njk',{title:'Error',noindex:true,error:process.env.NODE_ENV==='development'?err.message:null});
 });
-app.use((req,res)=>res.status(404).render('errors/404.njk',{title:'Página no encontrada'}));
+app.use((req,res)=>res.status(404).set('X-Robots-Tag','noindex').render('errors/404.njk',{title:'Página no encontrada',noindex:true}));
 
 if(require.main===module) app.listen(PORT,()=>console.log(`Estudio QR activo en http://localhost:${PORT}`));
 module.exports={app};
