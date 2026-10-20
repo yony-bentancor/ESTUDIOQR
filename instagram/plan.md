@@ -18,9 +18,9 @@ Cuando no quedan pendientes, se crean temas nuevos siguiendo la misma mezcla, si
 - [x] 2026-10-20 · presentacion · Presentación del estudio: "Tu idea, hecha tecnología" (manual)
 - [ ] proyecto · dulce29 · Dulce 29: tienda online de leches vegetales, kéfir y jugos hechos en Colonia; tienda, packs, bolsa de compras, cuenta de cliente, botón de WhatsApp y panel de administración · url: dulce29-eccb0f7d7a32.herokuapp.com · captura: sí
 - [ ] consejo · google · ¿Tu negocio aparece en Google? Por qué una web propia + perfil de Google ayudan a que te encuentren
-- [ ] proyecto · qpropiedades · QPROPIEDADES: gestor de propiedades, inquilinos y seguimiento de incidencias · url: qpropiedades-810f06568918.herokuapp.com
+- [ ] proyecto · qpropiedades · QPROPIEDADES: "Tu propiedad, bajo control". Gestión integral de propiedades: alquileres (cobros y vencimientos), documentos (contratos e impuestos), inquilinos, reparaciones y reclamos (el inquilino escanea un QR), recordatorios de vencimientos e historial de cada propiedad · url: qpropiedades-810f06568918.herokuapp.com · captura: sí
 - [ ] oferta · web-propia · Tu negocio merece una web propia: diseño a medida, adaptada al celular, lista para Google
-- [ ] proyecto · qcasa · QCASA: portal inmobiliario para publicar propiedades · url: qcasa-e445db3b49f9.herokuapp.com/qcasa
+- [ ] proyecto · qcasa · QCASA: inmobiliaria en Colonia del Sacramento ("Tu lugar en Colonia"). Casas, apartamentos, terrenos, chacras, campos y locales; buscador de compra/alquiler por tipo y zona, búsqueda avanzada, mapa, precios en USD y publicación de propiedades para dueños · url: qcasa-e445db3b49f9.herokuapp.com/qcasa · captura: sí
 - [ ] consejo · instagram-vs-web · Instagram no alcanza: la web es tuya, aparece en Google y no depende de un algoritmo
 - [ ] proyecto · relampago · Club Relámpago: sitio web institucional de un club · url: relampago-cbb2642c1c45.herokuapp.com
 - [ ] consejo · qr-negocios · Códigos QR para tu negocio: menú, catálogo, reseñas, WhatsApp, fichas de propiedades
@@ -28,6 +28,6 @@ Cuando no quedan pendientes, se crean temas nuevos siguiendo la misma mezcla, si
 - [ ] oferta · sistema-gestion · ¿Seguís usando planillas? Un sistema de gestión a medida ordena tu negocio
 - [ ] proyecto · editor-video · Editor de video online hecho por Estudio QR, funciona desde el navegador
 - [ ] consejo · tienda-online · Vender online sin pagar comisiones a terceros: tienda propia con panel de administración
-- [ ] proyecto · alternativa · Alternativa: sitio web desarrollado por Estudio QR · url: alternativas-1c4c4edd0605.herokuapp.com
+- [ ] proyecto · alternativa · Alternativa: plataforma de terapias y bienestar en Uruguay (masajes, yoga, reiki, acupuntura y más). Buscador, categorías, especialistas que ofrecen sus servicios, cuentas por rol, precios finales, horarios y reseñas. OJO: hoy es un sitio de DEMOSTRACIÓN con datos de prueba; presentarlo como plataforma desarrollada, sin afirmar que tiene especialistas, usuarios o cifras reales · url: alternativas-1c4c4edd0605.herokuapp.com · captura: sí
 - [ ] consejo · proceso · Cómo trabajamos: conversación, propuesta, desarrollo, lanzamiento y soporte
 - [ ] oferta · inmobiliarias · Para inmobiliarias: gestor de propiedades + portal + QR en cada cartel
