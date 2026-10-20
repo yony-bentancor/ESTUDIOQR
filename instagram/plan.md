@@ -16,7 +16,7 @@ Cuando no quedan pendientes, se crean temas nuevos siguiendo la misma mezcla, si
 ## Temas
 
 - [x] 2026-10-20 · presentacion · Presentación del estudio: "Tu idea, hecha tecnología" (manual)
-- [ ] proyecto · dulce29 · Dulce 29: sitio con tienda online y panel de administración · url: dulce29-eccb0f7d7a32.herokuapp.com
+- [ ] proyecto · dulce29 · Dulce 29: tienda online de leches vegetales, kéfir y jugos hechos en Colonia; tienda, packs, bolsa de compras, cuenta de cliente, botón de WhatsApp y panel de administración · url: dulce29-eccb0f7d7a32.herokuapp.com · captura: sí
 - [ ] consejo · google · ¿Tu negocio aparece en Google? Por qué una web propia + perfil de Google ayudan a que te encuentren
 - [ ] proyecto · qpropiedades · QPROPIEDADES: gestor de propiedades, inquilinos y seguimiento de incidencias · url: qpropiedades-810f06568918.herokuapp.com
 - [ ] oferta · web-propia · Tu negocio merece una web propia: diseño a medida, adaptada al celular, lista para Google

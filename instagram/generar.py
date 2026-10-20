@@ -150,9 +150,10 @@ def navegador(im, caja, captura, url):
     aw, ah = area[2] - area[0], area[3] - area[1]
     if captura and os.path.exists(captura):
         cap = Image.open(captura).convert('RGB')
-        esc = aw / cap.width
-        cap = cap.resize((aw, int(cap.height * esc)), Image.LANCZOS)
-        cap = cap.crop((0, 0, aw, min(ah, cap.height)))
+        esc = max(aw / cap.width, ah / cap.height)
+        cap = cap.resize((int(cap.width * esc) + 1, int(cap.height * esc) + 1), Image.LANCZOS)
+        cx = (cap.width - aw) // 2
+        cap = cap.crop((cx, 0, cx + aw, ah))
         mascara = Image.new('L', (aw, ah), 0)
         ImageDraw.Draw(mascara).rounded_rectangle((0, -30, aw, ah), 20, fill=255)
         lienzo = Image.new('RGB', (aw, ah), (255, 255, 255)); lienzo.paste(cap, (0, 0))
