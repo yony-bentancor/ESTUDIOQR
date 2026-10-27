@@ -17,7 +17,7 @@ Cuando no quedan pendientes, se crean temas nuevos siguiendo la misma mezcla, si
 
 - [x] 2026-10-20 · presentacion · Presentación del estudio: "Tu idea, hecha tecnología" (manual)
 - [x] 2026-10-24 · proyecto · dulce29 · Dulce 29: tienda online de leches vegetales, kéfir y jugos hechos en Colonia; tienda, packs, bolsa de compras, cuenta de cliente, botón de WhatsApp y panel de administración · url: dulce29-eccb0f7d7a32.herokuapp.com · captura: sí
-- [ ] consejo · google · ¿Tu negocio aparece en Google? Por qué una web propia + perfil de Google ayudan a que te encuentren
+- [x] 2026-10-27 · consejo · google · ¿Tu negocio aparece en Google? Por qué una web propia + perfil de Google ayudan a que te encuentren
 - [ ] proyecto · qpropiedades · QPROPIEDADES: "Tu propiedad, bajo control". Gestión integral de propiedades: alquileres (cobros y vencimientos), documentos (contratos e impuestos), inquilinos, reparaciones y reclamos (el inquilino escanea un QR), recordatorios de vencimientos e historial de cada propiedad · url: qpropiedades-810f06568918.herokuapp.com · captura: sí
 - [ ] oferta · web-propia · Tu negocio merece una web propia: diseño a medida, adaptada al celular, lista para Google
 - [ ] proyecto · qcasa · QCASA: inmobiliaria en Colonia del Sacramento ("Tu lugar en Colonia"). Casas, apartamentos, terrenos, chacras, campos y locales; buscador de compra/alquiler por tipo y zona, búsqueda avanzada, mapa, precios en USD y publicación de propiedades para dueños · url: qcasa-e445db3b49f9.herokuapp.com/qcasa · captura: sí
