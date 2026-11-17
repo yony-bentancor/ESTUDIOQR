@@ -23,7 +23,7 @@ Cuando no quedan pendientes, se crean temas nuevos siguiendo la misma mezcla, si
 - [x] 2026-11-07 · proyecto · qcasa · QCASA: inmobiliaria en Colonia del Sacramento ("Tu lugar en Colonia"). Casas, apartamentos, terrenos, chacras, campos y locales; buscador de compra/alquiler por tipo y zona, búsqueda avanzada, mapa, precios en USD y publicación de propiedades para dueños · url: qcasa-e445db3b49f9.herokuapp.com/qcasa · captura: sí
 - [x] 2026-11-10 · consejo · instagram-vs-web · Instagram no alcanza: la web es tuya, aparece en Google y no depende de un algoritmo
 - [x] 2026-11-14 · proyecto · relampago · Club Relámpago: sitio web institucional de un club · url: relampago-cbb2642c1c45.herokuapp.com
-- [ ] consejo · qr-negocios · Códigos QR para tu negocio: menú, catálogo, reseñas, WhatsApp, fichas de propiedades
+- [x] 2026-11-17 · consejo · qr-negocios · Códigos QR para tu negocio: menú, catálogo, reseñas, WhatsApp, fichas de propiedades
 - [ ] proyecto · la-mala-leche · La Mala Leche: juego de plataformas 2D que se juega en el navegador · url: still-hat-f113.yonybentancor.workers.dev
 - [ ] oferta · sistema-gestion · ¿Seguís usando planillas? Un sistema de gestión a medida ordena tu negocio
 - [ ] proyecto · editor-video · Editor de video online hecho por Estudio QR, funciona desde el navegador
