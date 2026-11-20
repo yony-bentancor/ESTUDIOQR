@@ -74,7 +74,7 @@ Estudio QR es un estudio de desarrollo digital con base en ${SITIO.ciudad}, Urug
 
 - [QPROPIEDADES – Gestor de propiedades](${links.qpropiedades}): sistema para administrar propiedades, inquilinos y seguimiento de incidencias.
 - [QCASA – Inmobiliaria](${links.qcasa}): portal inmobiliario para publicar propiedades.
-- [Dulce 29](https://dulce29-eccb0f7d7a32.herokuapp.com/): sitio web con tienda y panel de administración.
+- [Dulce 29](https://dulce29.com.uy/): sitio web con tienda y panel de administración.
 - [Club Relámpago](https://relampago-cbb2642c1c45.herokuapp.com/): sitio web institucional de un club.
 - [La Mala Leche](https://still-hat-f113.yonybentancor.workers.dev/): juego online de plataformas 2D.
 - [Editor de video](${links.editor}): editor de video online.
@@ -98,7 +98,7 @@ function datosEstructurados(links) {
   const proyectos = [
     ['Gestor de propiedades QPROPIEDADES', links.qpropiedades],
     ['Inmobiliaria QCASA', links.qcasa],
-    ['Sitio web Dulce 29', 'https://dulce29-eccb0f7d7a32.herokuapp.com/'],
+    ['Sitio web Dulce 29', 'https://dulce29.com.uy/'],
     ['Sitio web Club Relámpago', 'https://relampago-cbb2642c1c45.herokuapp.com/'],
     ['Juego online La Mala Leche', 'https://still-hat-f113.yonybentancor.workers.dev/'],
     ['Editor de video', links.editor],
