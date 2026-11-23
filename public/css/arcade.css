@@ -1,0 +1,44 @@
+/* Laboratorio Arcade · Estudio QR */
+.arc{--bg:#0c0b0a;--ink:#f4efe6;--muted:#8f8a82;--gold:#b58955;--line:#2a2724;min-height:100vh;background:radial-gradient(1200px 600px at 80% -10%,#1d1812 0%,transparent 60%),var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif;padding:0 48px 40px;overflow-x:hidden}
+.arc-header{display:flex;justify-content:space-between;align-items:center;height:96px}
+.arc-brand{display:flex;gap:8px;align-items:baseline;letter-spacing:.32em;font-size:13px}
+.arc-brand strong{color:var(--gold);font-size:15px}
+.arc-back{font-size:12px;letter-spacing:.22em;color:var(--muted);transition:color .2s}
+.arc-back:hover{color:var(--ink)}
+
+.arc-hero{max-width:1240px;margin:40px auto 56px}
+.arc-eyebrow{display:flex;align-items:center;gap:12px;margin:0 0 22px;font-size:12px;letter-spacing:.34em;color:var(--gold);font-weight:700}
+.arc-eyebrow i{width:10px;height:10px;background:var(--gold);box-shadow:0 0 14px var(--gold);animation:arc-blink 1.2s steps(2) infinite}
+.arc-hero h1{margin:0;font-size:clamp(46px,7.4vw,108px);line-height:.92;font-weight:900;letter-spacing:-.04em}
+.arc-hero h1 em{font-style:normal;color:var(--gold)}
+.arc-lead{max-width:560px;margin:26px 0 0;color:#bdb6ab;font-size:17px;line-height:1.6}
+
+.arc-grid{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.arc-card{--accent:#b58955;position:relative;display:flex;flex-direction:column;border:1px solid var(--line);background:#141210;transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.arc-card:not(.is-soon):hover{transform:translateY(-6px);border-color:var(--accent);box-shadow:0 22px 50px -20px var(--accent)}
+.arc-link{position:absolute;inset:0;z-index:3}
+.arc-link:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.arc-screen{position:relative;aspect-ratio:16/9;overflow:hidden;background:#000;border-bottom:1px solid var(--line)}
+.arc-screen img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease,filter .3s}
+.arc-card:not(.is-soon):hover .arc-screen img{transform:scale(1.04)}
+.arc-scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+.arc-placeholder{height:100%;display:grid;place-items:center;background:linear-gradient(135deg,#1a1714,#0d0c0b)}
+.arc-placeholder span{font-size:28px;font-weight:900;letter-spacing:-.02em;color:var(--accent);text-transform:uppercase;text-align:center;padding:0 20px;text-shadow:0 0 22px var(--accent)}
+.arc-info{display:flex;flex-direction:column;flex:1;padding:24px 24px 26px}
+.arc-info .arc-tag{margin:0 0 10px;font-size:11px;letter-spacing:.26em;color:var(--accent);font-weight:700;text-transform:uppercase}
+.arc-info h2{margin:0 0 10px;font-size:26px;letter-spacing:-.02em}
+.arc-info p{margin:0 0 22px;color:#a9a297;font-size:15px;line-height:1.55}
+.arc-cta{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid var(--line);font-size:13px;letter-spacing:.26em;font-weight:700}
+.arc-cta b{font-size:20px;transition:transform .25s}
+.arc-card:not(.is-soon):hover .arc-cta b{transform:translateX(6px);color:var(--accent)}
+.arc-card.is-soon .arc-cta{color:var(--muted)}
+.arc-card.is-soon .arc-screen img{filter:grayscale(.7) brightness(.6)}
+
+.arc-footer{max-width:1240px;margin:70px auto 0;display:flex;justify-content:space-between;gap:20px;padding-top:22px;border-top:1px solid var(--line);font-size:11px;letter-spacing:.26em;color:var(--muted)}
+.arc-footer span{color:var(--gold);animation:arc-blink 1.6s steps(2) infinite}
+.arc-footer a:hover{color:var(--ink)}
+
+@keyframes arc-blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.arc *{animation:none!important;transition:none!important}}
+@media (max-width:1000px){.arc-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:680px){.arc{padding:0 20px 30px}.arc-header{height:76px}.arc-hero{margin:18px 0 36px}.arc-grid{grid-template-columns:1fr}.arc-lead{font-size:16px}.arc-footer{flex-direction:column}}

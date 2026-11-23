@@ -44,6 +44,7 @@ function crearRouterSeo(links) {
     const hoy = new Date().toISOString().slice(0, 10);
     const urls = [
       { loc: `${base}/`, prioridad: '1.0' },
+      { loc: `${base}/arcade`, prioridad: '0.7' },
       { loc: `${base}/llms.txt`, prioridad: '0.3' }
     ];
     const xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -75,7 +76,7 @@ Estudio QR es un estudio de desarrollo digital con base en ${SITIO.ciudad}, Urug
 - [QCASA – Inmobiliaria](${links.qcasa}): portal inmobiliario para publicar propiedades.
 - [Dulce 29](https://dulce29.com.uy/): sitio web con tienda y panel de administración.
 - [Club Relámpago](https://relampago-cbb2642c1c45.herokuapp.com/): sitio web institucional de un club.
-- [La Mala Leche](https://still-hat-f113.yonybentancor.workers.dev/): juego online de plataformas 2D.
+- [Laboratorio Arcade](${base}/arcade): juegos 2D que se juegan en el navegador: La Mala Leche (plataformas), La Mala Leche 2 (plataformas, vuelta al mundo) y Furia Callejera (peleas).
 - [Alternativa](${links.alternativa}): sitio web.
 
 ## Contacto
@@ -98,7 +99,7 @@ function datosEstructurados(links) {
     ['Inmobiliaria QCASA', links.qcasa],
     ['Sitio web Dulce 29', 'https://dulce29.com.uy/'],
     ['Sitio web Club Relámpago', 'https://relampago-cbb2642c1c45.herokuapp.com/'],
-    ['Juego online La Mala Leche', 'https://still-hat-f113.yonybentancor.workers.dev/'],
+    ['Laboratorio Arcade (juegos online)', `${SITIO.url}/arcade`],
     ['Sitio web Alternativa', links.alternativa]
   ];
   return {

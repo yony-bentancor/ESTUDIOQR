@@ -1,0 +1,45 @@
+{% extends 'layouts/base.njk' %}
+
+{% block styles %}<link rel="stylesheet" href="/css/arcade.css?v=1">{% endblock %}
+
+{% block body %}
+  <main class="arc">
+    <header class="arc-header">
+      <a class="arc-brand" href="/" aria-label="Volver a Estudio QR">
+        <span>ESTUDIO</span>
+        <strong>QR</strong>
+      </a>
+      <a class="arc-back" href="/#proyectos">← PROYECTOS</a>
+    </header>
+
+    <section class="arc-hero">
+      <p class="arc-eyebrow"><i></i> LABORATORIO ARCADE</p>
+      <h1>Juegos hechos<br><em>en casa.</em></h1>
+      <p class="arc-lead">Acá probamos ideas jugando. Juegos 2D que corren en el navegador, sin instalar nada. Funcionan con teclado y con joystick.</p>
+    </section>
+
+    <section class="arc-grid" aria-label="Juegos">
+      {% for g in juegos %}
+      <article class="arc-card{% if not g.url %} is-soon{% endif %}" style="--accent:{{ g.color }}">
+        {% if g.url %}<a class="arc-link" href="{{ g.url }}" aria-label="Jugar {{ g.nombre }}"></a>{% endif %}
+        <div class="arc-screen">
+          {% if g.imagen %}<img src="{{ g.imagen }}" alt="Pantalla de {{ g.nombre }}" loading="lazy" width="960" height="540">
+          {% else %}<div class="arc-placeholder"><span>{{ g.nombre }}</span></div>{% endif %}
+          <span class="arc-scan" aria-hidden="true"></span>
+        </div>
+        <div class="arc-info">
+          <p class="arc-tag">{{ g.genero }}</p>
+          <h2>{{ g.nombre }}</h2>
+          <p>{{ g.texto }}</p>
+          <span class="arc-cta">{% if g.url %}JUGAR <b>→</b>{% else %}MUY PRONTO{% endif %}</span>
+        </div>
+      </article>
+      {% endfor %}
+    </section>
+
+    <footer class="arc-footer">
+      <span>INSERT COIN</span>
+      <a href="/">ESTUDIO QR · MONTEVIDEO, URUGUAY</a>
+    </footer>
+  </main>
+{% endblock %}

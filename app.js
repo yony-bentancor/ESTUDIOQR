@@ -19,8 +19,21 @@ const PORT=process.env.PORT||3000;
 app.locals.links={
   qpropiedades:process.env.QPROPIEDADES_URL||'https://qpropiedades-810f06568918.herokuapp.com/',
   qcasa:process.env.QCASA_URL||'https://qcasa-e445db3b49f9.herokuapp.com/qcasa',
-  alternativa:process.env.ALTERNATIVA_URL||'https://alternativas-1c4c4edd0605.herokuapp.com/'
+  alternativa:process.env.ALTERNATIVA_URL||'https://alternativas-1c4c4edd0605.herokuapp.com/',
+  // Laboratorio Arcade: sin URL el juego aparece como «Muy pronto».
+  lamalaleche:process.env.LAMALALECHE_URL||'https://still-hat-f113.yonybentancor.workers.dev/',
+  lamalaleche2:process.env.LAMALALECHE2_URL||'',
+  furia:process.env.FURIA_URL||''
 };
+// Juegos del Laboratorio Arcade (/arcade)
+const juegos=()=>[
+  {nombre:'La Mala Leche',genero:'Plataformas 2D',color:'#5aa9ff',url:app.locals.links.lamalaleche,imagen:'/img/arcade/la-mala-leche.jpg',
+    texto:'Una botella de leche que se niega a quedarse en el molde. De la fábrica al fondo del mar, en cinco niveles.'},
+  {nombre:'La Mala Leche 2',genero:'Plataformas · Vuelta al mundo',color:'#e5c35a',url:app.locals.links.lamalaleche2,imagen:'/img/arcade/la-mala-leche-2.jpg',
+    texto:'La botella sale a recorrer el mundo: Estados Unidos, España, Francia, Italia y más, con humor sobre los problemas de cada país.'},
+  {nombre:'Furia Callejera',genero:'Peleas 2D',color:'#e5533d',url:app.locals.links.furia,imagen:'/img/arcade/furia-callejera.jpg',
+    texto:'Juego de peleas con luchadores exagerados, poderes propios, combos y finales espectaculares. Ganá y pasá al siguiente rival.'}
+].map(j=>({...j,imagen:require('fs').existsSync(path.join(__dirname,'public',j.imagen))?j.imagen:null}));
 
 app.set('trust proxy',1);
 nunjucks.configure(path.join(__dirname,'views'),{autoescape:true,express:app,noCache:process.env.NODE_ENV!=='production'});
@@ -65,6 +78,10 @@ app.use(require('./estadisticas/contacto'));
 app.use(crearRouterSeo(app.locals.links));
 
 app.get('/',(req,res)=>res.render('home.njk',{title:'Estudio QR',pageTitle:'Estudio QR · Desarrollo web y software a medida en Montevideo, Uruguay'}));
+app.get('/arcade',(req,res)=>{
+  res.locals.metaDescription='Laboratorio Arcade de Estudio QR: juegos 2D hechos en Uruguay que se juegan en el navegador. La Mala Leche, La Mala Leche 2 y Furia Callejera.';
+  res.render('arcade.njk',{title:'Laboratorio Arcade',pageTitle:'Laboratorio Arcade · Juegos online de Estudio QR',juegos:juegos()});
+});
 // Enlaces viejos del repo unificado: se mandan al proyecto que corresponde.
 app.get(['/qpropiedades','/alta','/seguimiento','/ingresar'],(req,res)=>res.redirect(301,app.locals.links.qpropiedades));
 app.get('/qcasa*',(req,res)=>res.redirect(301,app.locals.links.qcasa));
