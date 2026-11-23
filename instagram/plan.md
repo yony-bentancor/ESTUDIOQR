@@ -26,7 +26,6 @@ Cuando no quedan pendientes, se crean temas nuevos siguiendo la misma mezcla, si
 - [x] 2026-11-17 · consejo · qr-negocios · Códigos QR para tu negocio: menú, catálogo, reseñas, WhatsApp, fichas de propiedades
 - [x] 2026-11-21 · proyecto · la-mala-leche · La Mala Leche: juego de plataformas 2D que se juega en el navegador · url: still-hat-f113.yonybentancor.workers.dev
 - [ ] oferta · sistema-gestion · ¿Seguís usando planillas? Un sistema de gestión a medida ordena tu negocio
-- [ ] proyecto · editor-video · Editor de video online hecho por Estudio QR, funciona desde el navegador
 - [ ] consejo · tienda-online · Vender online sin pagar comisiones a terceros: tienda propia con panel de administración
 - [ ] proyecto · alternativa · Alternativa: plataforma de terapias y bienestar en Uruguay (masajes, yoga, reiki, acupuntura y más). Buscador, categorías, especialistas que ofrecen sus servicios, cuentas por rol, precios finales, horarios y reseñas. OJO: hoy es un sitio de DEMOSTRACIÓN con datos de prueba; presentarlo como plataforma desarrollada, sin afirmar que tiene especialistas, usuarios o cifras reales · url: alternativas-1c4c4edd0605.herokuapp.com · captura: sí
 - [ ] consejo · proceso · Cómo trabajamos: conversación, propuesta, desarrollo, lanzamiento y soporte

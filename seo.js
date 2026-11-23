@@ -67,7 +67,6 @@ Estudio QR es un estudio de desarrollo digital con base en ${SITIO.ciudad}, Urug
 - Sistemas de gestión de propiedades y alquileres
 - Portales inmobiliarios
 - Juegos online y experiencias interactivas
-- Herramientas web (por ejemplo, edición de video en el navegador)
 - Códigos QR aplicados a negocios y propiedades
 
 ## Proyectos
@@ -77,7 +76,6 @@ Estudio QR es un estudio de desarrollo digital con base en ${SITIO.ciudad}, Urug
 - [Dulce 29](https://dulce29.com.uy/): sitio web con tienda y panel de administración.
 - [Club Relámpago](https://relampago-cbb2642c1c45.herokuapp.com/): sitio web institucional de un club.
 - [La Mala Leche](https://still-hat-f113.yonybentancor.workers.dev/): juego online de plataformas 2D.
-- [Editor de video](${links.editor}): editor de video online.
 - [Alternativa](${links.alternativa}): sitio web.
 
 ## Contacto
@@ -101,7 +99,6 @@ function datosEstructurados(links) {
     ['Sitio web Dulce 29', 'https://dulce29.com.uy/'],
     ['Sitio web Club Relámpago', 'https://relampago-cbb2642c1c45.herokuapp.com/'],
     ['Juego online La Mala Leche', 'https://still-hat-f113.yonybentancor.workers.dev/'],
-    ['Editor de video', links.editor],
     ['Sitio web Alternativa', links.alternativa]
   ];
   return {
