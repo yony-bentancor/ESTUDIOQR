@@ -22,7 +22,7 @@ app.locals.links={
   alternativa:process.env.ALTERNATIVA_URL||'https://alternativas-1c4c4edd0605.herokuapp.com/',
   // Laboratorio Arcade: sin URL el juego aparece como «Muy pronto».
   lamalaleche:process.env.LAMALALECHE_URL||'https://still-hat-f113.yonybentancor.workers.dev/',
-  lamalaleche2:process.env.LAMALALECHE2_URL||'',
+  lamalaleche2:process.env.LAMALALECHE2_URL||'https://lamalaleche2.yonybentancor.workers.dev/',
   furia:process.env.FURIA_URL||'https://furia-callejera.yonybentancor.workers.dev/'
 };
 // Juegos del Laboratorio Arcade (/arcade)
