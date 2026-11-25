@@ -52,7 +52,16 @@ function crearStoreArchivo() {
     async leerConfig() { return estado.config; },
     async guardarConfig(config) { estado.config = config; persistir(); },
     async guardarMensaje(m) { estado.mensajes.push(m); estado.mensajes = estado.mensajes.slice(-500); persistir(); },
-    async leerMensajes(limite = 50) { return estado.mensajes.slice(-limite).reverse(); }
+    async leerMensajes(limite = 50) {
+      return [...estado.mensajes].sort((a, b) => new Date(b.ts) - new Date(a.ts)).slice(0, limite).map((m) => ({ ...m, id: m.id || String(new Date(m.ts).getTime()) }));
+    },
+    async contarNoLeidos() { return estado.mensajes.filter((m) => !m.leido).length; },
+    async marcarLeidos() { estado.mensajes.forEach((m) => { m.leido = true; }); persistir(); },
+    async borrarMensajes(ids) {
+      const quitar = new Set(ids);
+      estado.mensajes = estado.mensajes.filter((m) => !quitar.has(m.id || String(new Date(m.ts).getTime())));
+      persistir();
+    }
   };
 }
 
@@ -112,7 +121,17 @@ function crearStoreMongo(uri) {
     async guardarMensaje(m) { const c = await conectar(); await c.mensajes.insertOne(m); },
     async leerMensajes(limite = 50) {
       const c = await conectar();
-      return c.mensajes.find({}, { projection: { _id: 0 } }).sort({ ts: -1 }).limit(limite).toArray();
+      const lista = await c.mensajes.find({}).sort({ ts: -1 }).limit(limite).toArray();
+      // Los mensajes viejos pueden no tener "id": se usa el _id de Mongo.
+      return lista.map(({ _id, ...m }) => ({ ...m, id: m.id || String(_id) }));
+    },
+    async contarNoLeidos() { const c = await conectar(); return c.mensajes.countDocuments({ leido: { $ne: true } }); },
+    async marcarLeidos() { const c = await conectar(); await c.mensajes.updateMany({ leido: { $ne: true } }, { $set: { leido: true } }); },
+    async borrarMensajes(ids) {
+      const c = await conectar();
+      const { ObjectId } = require('mongodb');
+      const oids = ids.filter((id) => /^[a-f0-9]{24}$/.test(id)).map((id) => new ObjectId(id));
+      await c.mensajes.deleteMany({ $or: [{ id: { $in: ids } }, { _id: { $in: oids } }] });
     }
   };
 }

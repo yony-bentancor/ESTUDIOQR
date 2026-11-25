@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mensajes · Panel</title>
+  {% include "panel/_estilos.njk" %}
+  <style>
+    .wrap{max-width:900px;margin:0 auto;padding:22px 16px 60px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:20px}
+    header h1{font-size:15px;margin:2px 0 0;font-weight:600;color:var(--muted)}
+    .barra{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+    .bandeja{background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+    details{border-bottom:1px solid var(--line)}
+    details:last-child{border-bottom:0}
+    summary{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;list-style:none}
+    summary::-webkit-details-marker{display:none}
+    summary .quien{font-weight:700;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+    summary .resumen{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+    summary .fecha{color:var(--muted);font-size:12px;white-space:nowrap}
+    details.nuevo summary .quien::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--alert);margin-right:7px;vertical-align:1px}
+    details[open] summary{background:var(--gold-soft)}
+    .cuerpo{padding:12px 14px 16px;display:grid;gap:10px}
+    .cuerpo .texto{white-space:pre-wrap}
+    .sub{color:var(--muted);font-size:12px}
+    .acciones{display:flex;gap:8px;flex-wrap:wrap}
+    .vacio{color:var(--muted);padding:18px 14px;margin:0}
+    .aviso{background:var(--ok-soft);color:var(--ok);border-radius:8px;padding:10px 14px;margin-bottom:12px}
+    @media (max-width:640px){summary{grid-template-columns:1fr auto}summary .resumen{grid-column:1/-1;grid-row:2}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><div class="marca">ESTUDIO <b>QR</b></div><h1>Mensajes de contacto</h1></div>
+    <a class="btn claro" href="{{ ruta }}">← Volver a las visitas</a>
+  </header>
+
+  {% if borrados %}<div class="aviso">{{ 'Se borró 1 mensaje.' if borrados == 1 else 'Se borraron ' + borrados + ' mensajes.' }}</div>{% endif %}
+
+  <div class="barra">
+    <span class="sub">{{ mensajes.length }} {{ 'mensaje' if mensajes.length == 1 else 'mensajes' }} · tocá uno para leerlo</span>
+    {% if mensajes.length %}
+    <form method="post" action="{{ ruta }}/mensajes/borrar" onsubmit="return confirm('¿Borrar todos los mensajes? No se pueden recuperar.')">
+      <input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="todos" value="1">
+      <button class="btn mini claro" type="submit">Borrar todos</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <div class="bandeja">
+    {% for m in mensajes %}
+      <details class="{% if m.nuevo %}nuevo{% endif %}">
+        <summary><span class="quien">{{ m.nombre }}</span><span class="resumen">{{ m.resumen }}</span><span class="fecha">{{ m.fecha }}</span></summary>
+        <div class="cuerpo">
+          <div class="sub"><a href="mailto:{{ m.email }}">{{ m.email }}</a>{% if m.correo %} · {{ m.correo }}{% endif %}</div>
+          <div class="texto">{{ m.mensaje }}</div>
+          <div class="acciones">
+            <a class="btn mini" href="mailto:{{ m.email }}?subject={{ ('Re: tu mensaje a Estudio QR') | urlencode }}">Responder</a>
+            <form method="post" action="{{ ruta }}/mensajes/borrar" onsubmit="return confirm('¿Borrar este mensaje?')">
+              <input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="id" value="{{ m.id }}">
+              <button class="btn mini claro" type="submit">Borrar</button>
+            </form>
+          </div>
+        </div>
+      </details>
+    {% else %}
+      <p class="vacio">No hay mensajes.</p>
+    {% endfor %}
+  </div>
+</div>
+</body>
+</html>

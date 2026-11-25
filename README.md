@@ -49,7 +49,9 @@ Estudio QR mide las entradas de todos los sitios del ecosistema y las muestra en
 - El script envía cada página vista a `/t/collect` (sin cookies; usa un identificador anónimo del navegador).
 - El panel está en `/<PANEL_RUTA>` (por defecto `/panel-privado-qr`) y pide usuario y contraseña.
 
-Muestra: entradas por sitio y por día, desde dónde (ubicación aproximada por IP), cómo llegaron, dispositivo, cada visitante y las últimas entradas, con aviso cuando entró alguien que no sos vos.
+Arriba muestra quién entró **ayer** (con pestañas para hoy, la última semana y el último mes) y una pestaña por sitio: por ejemplo, Dulce 29 → «Ayer entraron 4 personas: Montevideo · Colonia, Uruguay · Madrid, España…», con una fila por persona (hora, desde dónde, qué vio, cómo llegó). Los mensajes del formulario están en una bandeja aparte (`/<PANEL_RUTA>/mensajes`, botón «Mensajes» con los nuevos), donde se leen, se responden y se borran.
+
+Más abajo: entradas por sitio y por día, desde dónde (ubicación aproximada por IP), cómo llegaron, dispositivo, cada visitante y las últimas entradas, con aviso cuando entró alguien que no sos vos.
 
 **Distinguir tus visitas:** en el panel, «Herramientas · Marcar mis dispositivos» tiene un link por sitio; abrilo una vez desde cada navegador tuyo. También podés tocar «Soy yo» en cualquier visitante.
 

@@ -177,10 +177,42 @@ panel.post('/visitante', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+/* ---------- bandeja de mensajes ---------- */
+panel.get('/mensajes', async (req, res, next) => {
+  const sesion = sesionValida(req);
+  if (!sesion) return res.redirect(PANEL_RUTA);
+  try {
+    const lista = await store.leerMensajes(200);
+    res.render('panel/mensajes.njk', {
+      title: 'Mensajes', ruta: PANEL_RUTA, csrf: firmar('csrf' + sesion), borrados: Number(req.query.borrados) || 0,
+      mensajes: lista.map((m) => ({
+        id: m.id, nuevo: !m.leido, fecha: fmtFecha.format(new Date(m.ts)), nombre: m.nombre, email: m.email, mensaje: m.mensaje,
+        resumen: limpiar(String(m.mensaje || '').replace(/\s+/g, ' '), 140),
+        correo: m.correo === 'enviado' ? 'Aviso enviado por correo' : m.correo === 'error' ? 'No se pudo enviar el aviso por correo' : ''
+      }))
+    });
+    // Al abrir la bandeja, los mensajes quedan leídos (en la lista se siguen viendo como «nuevo» esta vez).
+    store.marcarLeidos().catch(() => {});
+  } catch (e) { next(e); }
+});
+
+panel.post('/mensajes/borrar', async (req, res, next) => {
+  const sesion = sesionValida(req);
+  if (!sesion || !iguales(req.body._csrf || '', firmar('csrf' + sesion))) return res.redirect(PANEL_RUTA);
+  try {
+    let ids = [].concat(req.body.id || []).map((id) => limpiar(id, 40)).filter(Boolean);
+    if (req.body.todos === '1') ids = (await store.leerMensajes(1000)).map((m) => m.id);
+    if (ids.length) await store.borrarMensajes(ids);
+    res.redirect(`${PANEL_RUTA}/mensajes?borrados=${ids.length}`);
+  } catch (e) { next(e); }
+});
+
 router.use(PANEL_RUTA, panel);
 
 /* ---------- cálculo del panel ---------- */
-const RANGOS = { hoy: 'Hoy', 7: 'Últimos 7 días', 30: 'Últimos 30 días', 90: 'Últimos 90 días', 365: 'Último año' };
+const RANGOS = { ayer: 'Ayer', hoy: 'Hoy', 7: 'Última semana', 30: 'Último mes', 90: 'Últimos 90 días', 365: 'Último año' };
+const RANGO_INICIAL = 'ayer';
+const FRASE = { ayer: 'Ayer', hoy: 'Hoy', 7: 'En la última semana', 30: 'En el último mes', 90: 'En los últimos 90 días', 365: 'En el último año' };
 
 function contar(lista, clave, top = 8) {
   const m = new Map();
@@ -189,16 +221,29 @@ function contar(lista, clave, top = 8) {
   return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, top).map(([k, n]) => ({ k, n, pct: Math.round((n / total) * 100) }));
 }
 const lugar = (v) => [v.city, v.region && v.region !== v.city ? v.region : '', v.country].filter(Boolean).join(', ') || 'Sin datos';
+// Versión corta para el resumen: "Montevideo", "Colonia, Uruguay", "Madrid, España".
+const lugarCorto = (v) => {
+  if (!v.country) return 'Sin ubicación';
+  if (v.country === 'Red local') return 'Red local';
+  const ciudad = v.city || v.region;
+  if (v.countryCode === 'UY' && ciudad && /montevideo/i.test(ciudad)) return 'Montevideo';
+  return ciudad ? `${ciudad}, ${v.country}` : v.country;
+};
+const bandera = (cc) => (/^[A-Z]{2}$/.test(cc || '') ? String.fromCodePoint(...[...cc].map((c) => 127397 + c.charCodeAt(0))) : '');
+const fmtHora = new Intl.DateTimeFormat('es-UY', { timeZone: ZONA, hour: '2-digit', minute: '2-digit', hour12: false });
 
 async function armarPanel(req, sesion) {
-  const rango = RANGOS[req.query.rango] ? String(req.query.rango) : '7';
+  const rango = RANGOS[req.query.rango] ? String(req.query.rango) : RANGO_INICIAL;
   const sitio = SITIOS[req.query.sitio] ? req.query.sitio : '';
   const mios = ['ocultar', 'mostrar', 'solo'].includes(req.query.mios) ? req.query.mios : 'ocultar';
   const bots = req.query.bots === 'mostrar' ? 'mostrar' : 'ocultar';
 
   const ahora = new Date();
-  let desde;
-  if (rango === 'hoy') desde = new Date(`${fmtDia.format(ahora)}T00:00:00${offsetDe(ahora)}`);
+  const inicioDia = (f) => new Date(`${fmtDia.format(f)}T00:00:00${offsetDe(f)}`);
+  const hoy0 = inicioDia(ahora);
+  let desde; let hasta = ahora;
+  if (rango === 'hoy') desde = hoy0;
+  else if (rango === 'ayer') { desde = inicioDia(new Date(hoy0.getTime() - 12 * 3600e3)); hasta = new Date(hoy0.getTime() - 1); }
   else desde = new Date(ahora.getTime() - Number(rango) * 864e5);
 
   const config = await store.leerConfig();
@@ -206,7 +251,7 @@ async function armarPanel(req, sesion) {
   const aliases = config.aliases || {};
   const esMio = (v) => v.yo || duenos.has(v.vid);
 
-  const todas = (await store.buscar(desde, ahora)).sort((a, b) => b.ts - a.ts);
+  const todas = (await store.buscar(desde, hasta)).sort((a, b) => b.ts - a.ts);
   const base = todas.filter((v) => (bots === 'mostrar' || !v.bot) && (!sitio || v.site === sitio));
   const visitas = base.filter((v) => (mios === 'mostrar' ? true : mios === 'solo' ? esMio(v) : !esMio(v)));
   const ajenas = base.filter((v) => !esMio(v));
@@ -255,9 +300,9 @@ async function armarPanel(req, sesion) {
 
   // por día
   const dias = [];
-  const nDias = rango === 'hoy' ? 1 : Math.min(Number(rango), 90);
+  const nDias = rango === 'hoy' || rango === 'ayer' ? 1 : Math.min(Number(rango), 90);
   for (let i = nDias - 1; i >= 0; i--) {
-    const d = fmtDia.format(new Date(ahora.getTime() - i * 864e5));
+    const d = fmtDia.format(new Date(hasta.getTime() - i * 864e5));
     dias.push({ dia: d, n: 0 });
   }
   const idx = new Map(dias.map((d, i) => [d.dia, i]));
@@ -288,6 +333,43 @@ async function armarPanel(req, sesion) {
       sitios: [...g.sitios].join(', '), refs: [...g.refs].join(', '), ips: [...g.ips].slice(-3).join(', '),
       lugar: g.lugar, dispositivo: g.dispositivo, isp: g.isp
     }));
+
+  // Quién entró: una fila por persona (navegador) y sitio, de la más reciente a la más vieja.
+  const porPersona = new Map();
+  visitas.forEach((v) => { // visitas está ordenada de la más nueva a la más vieja
+    const k = v.vid + '|' + v.site;
+    let p = porPersona.get(k);
+    if (!p) { p = { v, paginas: [], ultima: v.ts, primera: v.ts }; porPersona.set(k, p); }
+    p.primera = v.ts; p.paginas.push(v.path); p.llegada = v;
+  });
+  const fmtCuando = nDias === 1 ? fmtHora : fmtFecha;
+  const personas = [...porPersona.values()].slice(0, 200).map(({ v, paginas, ultima, primera, llegada }) => ({
+    vid: v.vid, quien: aliases[v.vid] || '', mio: esMio(v),
+    sitio: SITIOS[v.site] ? SITIOS[v.site].nombre : v.site,
+    lugar: lugarCorto(v), detalle: lugar(v), bandera: bandera(v.countryCode), isp: v.isp,
+    paginas: paginas.length, recorrido: [...new Set(paginas.reverse())].slice(0, 6).join(' → '),
+    cuando: fmtCuando.format(primera) + (ultima - primera > 60e3 ? ' – ' + fmtHora.format(ultima) : ''),
+    origen: origenDe(llegada.referrer, llegada.host), ref: llegada.ref,
+    dispositivo: `${v.device} · ${v.os}`, bot: v.bot
+  }));
+  // Resumen en una frase: cuántas personas y de dónde.
+  const lugares = new Map();
+  [...porPersona.values()].forEach(({ v }) => { const l = lugarCorto(v); lugares.set(l, (lugares.get(l) || 0) + 1); });
+  const nPersonas = new Set(visitas.map((v) => v.vid)).size;
+  const frase = {
+    cuando: FRASE[rango],
+    personas: nPersonas,
+    donde: sitio ? (SITIOS[sitio] ? SITIOS[sitio].nombre : sitio) : 'tus sitios',
+    paginas: visitas.length,
+    lugares: [...lugares.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([l, n]) => (n > 1 ? `${n} de ${l}` : l)),
+    quien: mios === 'solo' ? 'tus visitas' : mios === 'mostrar' ? 'todas' : 'otras personas'
+  };
+  // Pestañas de sitios: personas de cada sitio en el período (con los mismos filtros, sin el de sitio).
+  const sinSitio = todas.filter((v) => (bots === 'mostrar' || !v.bot) && (mios === 'mostrar' ? true : mios === 'solo' ? esMio(v) : !esMio(v)));
+  const pestanas = Object.entries(SITIOS).map(([clave, s]) => ({
+    clave, nombre: s.nombre, personas: new Set(sinSitio.filter((v) => v.site === clave).map((v) => v.vid)).size
+  }));
+  const totalPersonas = new Set(sinSitio.map((v) => v.vid)).size;
 
   const ultimas = visitas.slice(0, 300).map((v) => ({
     fecha: fmtFecha.format(v.ts),
@@ -323,7 +405,7 @@ async function armarPanel(req, sesion) {
       visitantesAjenos: new Set(ajenas.map((v) => v.vid)).size,
       ultimaAjena: ajenas[0] ? `${fmtFecha.format(ajenas[0].ts)} · ${SITIOS[ajenas[0].site] ? SITIOS[ajenas[0].site].nombre : ajenas[0].site} · ${lugar(ajenas[0])}` : ''
     },
-    porSitio, dias,
+    porSitio, dias, personas, frase, pestanas, totalPersonas,
     paises: contar(visitas, lugar),
     mapaJson: JSON.stringify(mapa).replace(/</g, '\\u003c'), mapaPuntos: mapa.length, sinUbicar,
     origenes: contar(visitas, (v) => origenDe(v.referrer, v.host)),
@@ -331,10 +413,7 @@ async function armarPanel(req, sesion) {
     dispositivos: contar(visitas, 'device'),
     paginas: contar(visitas, (v) => `${SITIOS[v.site] ? SITIOS[v.site].nombre : v.site} ${v.path}`),
     visitantes, ultimas,
-    mensajes: (await store.leerMensajes(30).catch(() => [])).map((m) => ({
-      fecha: fmtFecha.format(new Date(m.ts)), nombre: m.nombre, email: m.email, mensaje: m.mensaje,
-      correo: m.correo === 'enviado' ? 'Aviso enviado por correo' : m.correo === 'error' ? 'No se pudo enviar el aviso por correo' : ''
-    })),
+    noLeidos: await store.contarNoLeidos().catch(() => 0),
     linksDueno: Object.values(SITIOS).filter((s) => s.url).map((s) => ({
       nombre: s.nombre,
       marcar: s.url + (s.url.includes('?') ? '&' : '?') + 'qr_yo=' + token,

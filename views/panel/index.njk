@@ -66,6 +66,22 @@
     .mapa-leyenda i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
     .leaflet-popup-content{font:13px/1.45 Arial,Helvetica,sans-serif;margin:10px 12px}
     .leaflet-popup-content b{font-size:14px}
+    .cabeza-acciones{display:flex;gap:8px;align-items:center}
+    .badge{display:inline-block;min-width:20px;padding:1px 6px;border-radius:20px;background:var(--alert);color:#fff;font-size:11px;text-align:center}
+    .pestanas{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+    .pestanas a{display:inline-flex;gap:6px;align-items:center;padding:7px 12px;border:1px solid var(--line);border-radius:20px;text-decoration:none;color:var(--ink);background:var(--card);font-size:13px;white-space:nowrap}
+    .pestanas a.activa{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+    .pestanas a small{color:var(--muted);font-weight:700}
+    .pestanas a.activa small{color:var(--bg);opacity:.75}
+    .pestanas a.cero{opacity:.55}
+    .pestanas.periodo a{border-radius:6px}
+    .resumen{display:flex;gap:18px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin:6px 0 16px}
+    .resumen b.grande{font-size:44px;line-height:1;font-variant-numeric:tabular-nums;color:var(--gold)}
+    .resumen p{margin:0;font-size:16px}
+    .resumen .sub{margin-top:4px}
+    .opciones{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:0 0 16px}
+    .opciones label{display:grid;gap:4px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);min-width:180px}
+    td .band{font-size:18px;margin-right:6px;vertical-align:-2px}
     @media (max-width:900px){ #mapa{height:320px}}
     @media (max-width:900px){.filtros{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2,.grid3{grid-template-columns:1fr}.generador{grid-template-columns:1fr}}
   </style>
@@ -77,69 +93,77 @@
       <div class="marca">ESTUDIO <b>QR</b></div>
       <h1>Panel de visitas</h1>
     </div>
-    <form method="post" action="{{ ruta }}/salir"><button class="btn claro" type="submit">Salir</button></form>
+    <div class="cabeza-acciones">
+      <a class="btn claro" href="{{ ruta }}/mensajes">Mensajes{% if noLeidos %} <span class="badge">{{ noLeidos }}</span>{% endif %}</a>
+      <form method="post" action="{{ ruta }}/salir"><button class="btn claro" type="submit">Salir</button></form>
+    </div>
   </header>
 
-  <form class="filtros" method="get" action="{{ ruta }}">
-    <label>Período
-      <select name="rango">{% for k, v in RANGOS %}<option value="{{ k }}" {% if k == rango %}selected{% endif %}>{{ v }}</option>{% endfor %}</select>
-    </label>
-    <label>Sitio
-      <select name="sitio"><option value="">Todos los sitios</option>{% for s in sitios %}<option value="{{ s.clave }}" {% if s.clave == sitio %}selected{% endif %}>{{ s.nombre }}</option>{% endfor %}</select>
-    </label>
+  {% set q = '&mios=' + mios + '&bots=' + bots %}
+  <nav class="pestanas periodo" aria-label="Período">
+    {% for k in ['ayer','hoy','7','30'] %}<a class="{% if k == rango %}activa{% endif %}" href="{{ ruta }}?rango={{ k }}&sitio={{ sitio }}{{ q }}">{{ RANGOS[k] }}</a>{% endfor %}
+    {% if rango == '90' or rango == '365' %}<a class="activa" href="#">{{ RANGOS[rango] }}</a>{% endif %}
+  </nav>
+  <nav class="pestanas" aria-label="Sitio">
+    <a class="{% if not sitio %}activa{% endif %}" href="{{ ruta }}?rango={{ rango }}{{ q }}">Todos <small>{{ totalPersonas }}</small></a>
+    {% for p in pestanas %}<a class="{% if p.clave == sitio %}activa{% endif %}{% if not p.personas %} cero{% endif %}" href="{{ ruta }}?rango={{ rango }}&sitio={{ p.clave }}{{ q }}">{{ p.nombre }} <small>{{ p.personas }}</small></a>{% endfor %}
+  </nav>
+
+  <div class="resumen">
+    <b class="grande">{{ frase.personas }}</b>
+    <div>
+      <p>{{ frase.cuando }} {% if frase.personas == 1 %}entró 1 persona{% else %}entraron {{ frase.personas }} personas{% endif %} a {{ frase.donde }}{% if frase.lugares.length %}: {{ frase.lugares | join(' · ') }}{% endif %}.</p>
+      <div class="sub">{{ frase.paginas }} {{ 'página vista' if frase.paginas == 1 else 'páginas vistas' }} · se muestran {{ frase.quien }}{% if bots == 'ocultar' %}, sin robots{% endif %}.</div>
+    </div>
+  </div>
+
+  <section>
+    <h2>Quién entró</h2>
+    {% if personas.length %}
+    <div class="tabla"><table>
+      <thead><tr><th>{% if rango == 'ayer' or rango == 'hoy' %}Hora{% else %}Cuándo{% endif %}</th><th>Desde dónde</th><th>Sitio</th><th>Qué vio</th><th>Cómo llegó</th><th>Dispositivo</th></tr></thead>
+      <tbody>
+      {% for p in personas %}
+        <tr class="{% if p.mio %}mio{% endif %}">
+          <td style="white-space:nowrap">{{ p.cuando }}</td>
+          <td><span class="band">{{ p.bandera }}</span><b>{{ p.lugar }}</b>{% if p.quien %} <span class="chip">{{ p.quien }}</span>{% endif %}{% if p.mio %} <span class="chip yo">vos</span>{% endif %}{% if p.bot %} <span class="chip bot">robot</span>{% endif %}
+            <div class="sub">{{ p.detalle }}{% if p.isp %} · {{ p.isp }}{% endif %}</div></td>
+          <td>{{ p.sitio }}</td>
+          <td>{{ p.paginas }} {{ 'página' if p.paginas == 1 else 'páginas' }}<div class="sub">{{ p.recorrido }}</div></td>
+          <td>{{ p.origen }}{% if p.ref %} <span class="chip">link: {{ p.ref }}</span>{% endif %}</td>
+          <td>{{ p.dispositivo }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    {% else %}<p class="vacio">Nadie entró {{ frase.cuando | lower }} a {{ frase.donde }}.</p>{% endif %}
+  </section>
+
+  <form class="opciones" method="get" action="{{ ruta }}">
+    <input type="hidden" name="rango" value="{{ rango }}"><input type="hidden" name="sitio" value="{{ sitio }}">
     <label>Mis visitas
-      <select name="mios">
+      <select name="mios" onchange="this.form.submit()">
         <option value="ocultar" {% if mios == 'ocultar' %}selected{% endif %}>Ocultar las mías</option>
         <option value="mostrar" {% if mios == 'mostrar' %}selected{% endif %}>Mostrar todo</option>
         <option value="solo" {% if mios == 'solo' %}selected{% endif %}>Solo las mías</option>
       </select>
     </label>
     <label>Robots y vistas previas
-      <select name="bots">
+      <select name="bots" onchange="this.form.submit()">
         <option value="ocultar" {% if bots == 'ocultar' %}selected{% endif %}>Ocultar</option>
         <option value="mostrar" {% if bots == 'mostrar' %}selected{% endif %}>Mostrar</option>
       </select>
     </label>
-    <button class="btn" type="submit">Ver</button>
+    <label>Período más largo
+      <select onchange="if(this.value){this.form.elements.rango.value=this.value;this.form.submit()}" aria-label="Período más largo">
+        <option value="">Elegir…</option><option value="90" {% if rango == '90' %}selected{% endif %}>Últimos 90 días</option><option value="365" {% if rango == '365' %}selected{% endif %}>Último año</option>
+      </select>
+    </label>
   </form>
-
-  {% if resumen.ajenas %}
-    <div class="aviso alerta"><span class="punto"></span><div>
-      <strong>Entraron otras personas: {{ resumen.ajenas }} {{ 'entrada' if resumen.ajenas == 1 else 'entradas' }} de {{ resumen.visitantesAjenos }} {{ 'navegador que no es tuyo' if resumen.visitantesAjenos == 1 else 'navegadores que no son tuyos' }}.</strong>
-      Última: {{ resumen.ultimaAjena }}
-    </div></div>
-  {% else %}
-    <div class="aviso ok"><span class="punto"></span><div><strong>Nadie más entró en este período.</strong>Todas las entradas registradas son tuyas (o no hubo entradas).</div></div>
-  {% endif %}
 
   {% if almacenamiento == 'archivo' %}
     <div class="aviso info"><span class="punto"></span><div><strong>Las visitas se guardan de forma temporal.</strong>Falta configurar MONGODB_URI en Heroku: sin eso, los datos se borran cada vez que la app se reinicia (al menos una vez por día).</div></div>
   {% endif %}
-
-  <div class="kpis">
-    <div class="kpi"><b>{{ resumen.entradas }}</b><span>Entradas (páginas vistas)</span></div>
-    <div class="kpi"><b>{{ resumen.visitantes }}</b><span>Navegadores distintos</span></div>
-    <div class="kpi"><b>{{ resumen.sesiones }}</b><span>Visitas (sesiones)</span></div>
-    <div class="kpi {% if resumen.ajenas %}destacado{% endif %}"><b>{{ resumen.visitantesAjenos }}</b><span>Personas que no sos vos</span></div>
-  </div>
-
-  <section>
-    <h2>Mensajes de contacto</h2>
-    {% if mensajes.length %}
-    <div class="tabla"><table>
-      <thead><tr><th>Fecha</th><th>De</th><th>Mensaje</th></tr></thead>
-      <tbody>
-      {% for m in mensajes %}
-        <tr>
-          <td style="white-space:nowrap">{{ m.fecha }}</td>
-          <td><b>{{ m.nombre }}</b><div class="sub"><a href="mailto:{{ m.email }}">{{ m.email }}</a></div></td>
-          <td style="white-space:pre-wrap">{{ m.mensaje }}{% if m.correo %}<div class="sub">{{ m.correo }}</div>{% endif %}</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table></div>
-    {% else %}<p class="vacio">Todavía no llegaron mensajes del formulario de contacto.</p>{% endif %}
-  </section>
 
   <section>
     <h2>Por sitio</h2>
